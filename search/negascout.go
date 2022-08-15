@@ -1,6 +1,9 @@
 package search
 
 import (
+	"math"
+	"nicarao/eval"
+	"nicarao/moveOrdering"
 	"nicarao/utils"
 
 	chess "github.com/dylhunn/dragontoothmg"
@@ -9,7 +12,7 @@ import (
 const FullDepthMove = 6
 
 func pvReduction(depth int) int {
-	return depth / 3
+	return int(math.Round(float64(depth) / 3.0))
 }
 
 func isLMROk(board *chess.Board, move chess.Move) bool {
@@ -19,21 +22,20 @@ func isLMROk(board *chess.Board, move chess.Move) bool {
 }
 
 func Negascout(board *chess.Board, depth int, color int, alpha int, beta int) int {
-	PVLength[Ply] = Ply
-	var hashFlag int = HashFlagAlpha
-	var moveList []chess.Move = board.GenerateLegalMoves()
-	var score int = 0
 	var hashScore = ReadHashEntry(board.Hash(), alpha, beta, depth)
 	if hashScore != NoHashEntry && Ply > 0 {
 		return hashScore
 	}
+	PVLength[Ply] = Ply
+	var hashFlag int = HashFlagAlpha
+	var moveList []chess.Move = moveOrdering.SortMoves(board.GenerateLegalMoves(), board, PVTable[0], color, Ply)
+	var score int = 0
 	if depth == 0 || len(moveList) == 0 {
-		return 0
+		return eval.Quiesce(board, color, alpha, beta, &Ply, &Nodes) //eval.Evaluate(board, color)
 	}
 	for i := 0; i < len(moveList); i++ {
 		move := moveList[i]
-		GetPieces(move, board)
-		unmakeFunc := Make(board, move)
+		unmakeFunc := utils.Make(board, move, &Ply, &Nodes)
 		if i > FullDepthMove && isLMROk(board, move) {
 			score = -Negascout(board, pvReduction(depth), -color, -alpha-1, -alpha)
 			if score > alpha && score < beta {
@@ -47,11 +49,12 @@ func Negascout(board *chess.Board, depth int, color int, alpha int, beta int) in
 		Unmake(unmakeFunc)
 		if score > alpha {
 			StorePV(move)
+			moveOrdering.StoreHistoryMove(move, board, depth, color)
 			hashFlag = HashFlagExact
 			alpha = score
 		}
 		if score >= beta {
-			StoreKillerMove(move, board)
+			moveOrdering.StoreKillerMove(move, board, Ply)
 			WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta)
 			return beta
 		}
