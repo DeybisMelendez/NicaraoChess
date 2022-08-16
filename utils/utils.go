@@ -76,16 +76,3 @@ func GetPiece(square uint8, board *chess.Board) (int, bool) {
 	}
 	return piece, isWhite
 }
-
-func Make(board *chess.Board, move chess.Move, ply *int, nodes *int) func() {
-	*ply++
-	*nodes++
-	//eval.UpdateMaterial(board, move)
-	return board.Apply(move)
-}
-
-func Unmake(f func(), ply *int) {
-	*ply--
-	//eval.RevertMaterial()
-	f()
-}

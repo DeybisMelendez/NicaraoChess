@@ -34,7 +34,7 @@ func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove 
 
 func SortMoves(moves []chess.Move, board *chess.Board, pvTable [64]chess.Move, bestmove chess.Move, color int, ply int) []chess.Move {
 	pvMove := pvTable[ply]
-	sort.Slice(moves, func(a, b int) bool {
+	sort.SliceStable(moves, func(a, b int) bool {
 		valueA := valueMove(board, moves[a], pvMove, bestmove, color, ply)
 		valueB := valueMove(board, moves[b], pvMove, bestmove, color, ply)
 		return valueA > valueB

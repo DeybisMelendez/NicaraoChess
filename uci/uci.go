@@ -54,6 +54,7 @@ func uci() {
 }
 
 func isReady() {
+	search.InitHasTable()
 	fmt.Println("readyok")
 }
 
@@ -74,7 +75,10 @@ func position(command string) {
 		if len(split) > 0 {
 			moves := strings.Fields(split)
 			for i := 0; i < len(moves); i++ {
-				move, _ := chess.ParseMove(moves[i])
+				move, err := chess.ParseMove(moves[i])
+				if err != nil {
+					fmt.Println(err)
+				}
 				_ = board.Apply(move)
 			}
 		}
@@ -86,7 +90,7 @@ func goCommand(command string) {
 		clock := -1
 		var stopTime int64 = -1
 		depth := -1
-		movesToGo := 30
+		movesToGo := -1
 		var moveTime int64 = -1
 		inc := 0
 		goCommand := strings.Fields(command)
@@ -123,16 +127,14 @@ func goCommand(command string) {
 		if goCommand[1] == "depth" {
 			depth, _ = strconv.Atoi(goCommand[2])
 		}
-
 		start := time.Now().UnixMilli()
-		fmt.Println(moveTime, movesToGo)
-		if moveTime != -1 {
-			/*timeTotal := clock - 50
-			movetime := int(float32(timeTotal)/float32(movesToGo)) + inc
-			if inc > 0 && timeTotal < 5*inc {
-				movetime = int(float32(75*inc) / 100)
+		if moveTime != -1 && movesToGo == -1 {
+			/*var timeTotal int64 = int64(clock) - 50
+			movetime := timeTotal/int64(movesToGo) + int64(inc)
+			if inc > 0 && timeTotal < int64(5*inc) {
+				movetime = int64(75 * inc / 100)
 			}*/
-			stopTime = start + moveTime - 50 //ajuste
+			stopTime = start + moveTime //ajuste
 		}
 		if depth == -1 {
 			depth = 64

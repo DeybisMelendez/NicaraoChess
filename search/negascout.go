@@ -2,7 +2,6 @@ package search
 
 import (
 	"fmt"
-	"nicarao/eval"
 	"nicarao/moveOrdering"
 	"nicarao/utils"
 	"time"
@@ -12,7 +11,7 @@ import (
 
 func Search(board *chess.Board, stopTime int64, depth int) {
 	score := 0
-	InitHasTable()
+	//InitHasTable()
 	ResetPVTable()
 	ResetGlobalVariables()
 	moveOrdering.ResetKillerMoves()
@@ -73,11 +72,11 @@ func Negascout(board *chess.Board, depth int, color int, alpha int, beta int) in
 	var score int = 0
 
 	if depth == 0 || len(moveList) == 0 {
-		return eval.Quiesce(board, color, alpha, beta, &Ply, &Nodes) //eval.Evaluate(board, color) //
+		return Quiesce(board, color, alpha, beta) //eval.Evaluate(board, color) //
 	}
 	for i := 0; i < len(moveList); i++ {
 		move := moveList[i]
-		unmakeFunc := utils.Make(board, move, &Ply, &Nodes)
+		unmakeFunc := Make(board, move)
 		if i > FullDepthMove && isLMROk(board, move) {
 			score = -Negascout(board, pvReduction(depth), -color, -alpha-1, -alpha)
 			if score > alpha && score < beta {

@@ -26,7 +26,7 @@ func InitHasTable() {
 	hashTable = newHashTable
 	var entries int = int(hashEntries)
 	for i := 0; i < entries; i++ {
-		hashTable = append(hashTable, hashEntry{hash: 0, depth: 0, flag: 0, score: 0})
+		hashTable = append(hashTable, hashEntry{hash: 0, depth: 0, flag: 0, score: 0, bestmove: 0})
 	}
 }
 
