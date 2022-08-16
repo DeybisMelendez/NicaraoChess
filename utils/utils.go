@@ -33,6 +33,13 @@ func Find(a []string, x string) int {
 
 // Contains tells whether a contains x.
 
+func Checkmate(board *chess.Board) bool {
+	if board.OurKingInCheck() && len(board.GenerateLegalMoves()) == 0 {
+		return true
+	}
+	return false
+}
+
 func GetPiece(square uint8, board *chess.Board) (int, bool) {
 	squareMask := uint64(1) << square
 	piece := chess.Nothing
@@ -51,24 +58,21 @@ func GetPiece(square uint8, board *chess.Board) (int, bool) {
 		piece = chess.Queen
 	} else if w.Kings&squareMask != 0 {
 		piece = chess.King
-	} else if b.Pawns&squareMask != 0 {
-		piece = chess.Pawn
+	} else {
 		isWhite = false
-	} else if b.Knights&squareMask != 0 {
-		piece = chess.Knight
-		isWhite = false
-	} else if b.Bishops&squareMask != 0 {
-		piece = chess.Bishop
-		isWhite = false
-	} else if b.Rooks&squareMask != 0 {
-		piece = chess.Rook
-		isWhite = false
-	} else if b.Queens&squareMask != 0 {
-		piece = chess.Queen
-		isWhite = false
-	} else if b.Kings&squareMask != 0 {
-		piece = chess.King
-		isWhite = false
+		if b.Pawns&squareMask != 0 {
+			piece = chess.Pawn
+		} else if b.Knights&squareMask != 0 {
+			piece = chess.Knight
+		} else if b.Bishops&squareMask != 0 {
+			piece = chess.Bishop
+		} else if b.Rooks&squareMask != 0 {
+			piece = chess.Rook
+		} else if b.Queens&squareMask != 0 {
+			piece = chess.Queen
+		} else if b.Kings&squareMask != 0 {
+			piece = chess.King
+		}
 	}
 	return piece, isWhite
 }

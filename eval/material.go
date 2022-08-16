@@ -9,10 +9,10 @@ import (
 var MaterialWeightMG = [7]int{0, 100, 320, 330, 500, 900, 10000}
 var MaterialWeightEG = [7]int{0, 120, 320, 350, 550, 900}
 
-var MaterialMG int = 0
-var lastMaterial int = 0
+//var MaterialMG int = 0
+//var lastMaterial int = 0
 
-func GetMaterial(board *chess.Board) int {
+func ValueMaterial(board *chess.Board) int {
 	var white int = 0
 	var black int = 0
 	for i := 0; i < 63; i++ {
@@ -26,10 +26,11 @@ func GetMaterial(board *chess.Board) int {
 	return white - black
 }
 
-func UpdateMaterial(board *chess.Board, move chess.Move) {
+/*func UpdateMaterial(board *chess.Board, move chess.Move) {
 	capture, isWhite := utils.GetPiece(move.To(), board)
+	MaterialMG = lastMaterial
 	if chess.IsCapture(move, board) {
-		MaterialMG = lastMaterial
+		fmt.Println("iscapture,", MaterialWeightMG[capture], isWhite)
 		if isWhite {
 			MaterialMG -= MaterialWeightMG[capture]
 		} else {
@@ -56,3 +57,4 @@ func ResetMaterial() {
 	MaterialMG = 0
 	lastMaterial = 0
 }
+*/

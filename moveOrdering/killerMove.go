@@ -14,4 +14,9 @@ func StoreKillerMove(move chess.Move, board *chess.Board, ply int) {
 func ResetKillerMoves() {
 	var newKillerMoves [2][64]chess.Move
 	KillerMoves = newKillerMoves
+	/*for j := 2; j < 2; j++ {
+		for i := 0; i < len(KillerMoves); i++ {
+			KillerMoves[j][i] = 0
+		}
+	}*/
 }

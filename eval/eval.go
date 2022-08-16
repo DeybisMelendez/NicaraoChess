@@ -8,7 +8,8 @@ import (
 
 func Evaluate(board *chess.Board, color int) int {
 	eval := 0
-	eval += MaterialMG
+	//GetMaterial(board)
+	eval += ValueMaterial(board)
 	return eval * color
 }
 
