@@ -1,7 +1,6 @@
 package moveOrdering
 
 import (
-	"nicarao/utils"
 	"sort"
 
 	chess "github.com/dylhunn/dragontoothmg"
@@ -20,27 +19,15 @@ func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove 
 	if move == bestmove {
 		score += 6000000
 	}
-	//if ply > 0 && FollowPV {
-	//	FollowPV = false
 	if move == pvMove {
-		//FollowPV = true
 		score += 3000000
 	}
-	//}
 	if KillerMoves[0][ply] == move {
 		score += 2000000
 	} else if KillerMoves[1][ply] == move {
 		score += 1000000
 	}
-	piece, _ := utils.GetPiece(move.From(), board)
-	historyMove := GetHistoryMove(color, piece, move.From())
-	if historyMove != 0 {
-		//fmt.Println(historyMove)
-		//score += historyMove + 10000
-	}
-	//if score == 0 {
 	score += GetMVV_LVA(move, board)
-	//}
 	return score
 }
 

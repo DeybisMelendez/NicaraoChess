@@ -26,7 +26,6 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	StopTime = stopTime
 	currDepth := 1
 	turn := -1
-	//var bestmove chess.Move
 	if board.Wtomove {
 		turn = 1
 	}
@@ -35,9 +34,6 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 		if depth == 0 {
 			break
 		}
-		//Mate = MateScore
-		//moveOrdering.FollowPV = true
-		//eval.GetMaterial(board)
 		score = Negascout(board, currDepth, alpha, beta, turn, DoNull)
 		if isTimeToStop() {
 			break
@@ -49,12 +45,9 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			"nodes", Nodes,
 			"pv", FormatPV(PVTable[0]))
 		ResetGlobalVariables()
-		//eval.ResetMaterial()
-		//eval.GetMaterial(board)
 		depth--
 		currDepth++
 	}
-	//Bestmove = PVTable[0][0]
 	toPrint := "bestmove " + Bestmove.String()
 	fmt.Println(toPrint)
 }
@@ -109,7 +102,6 @@ func Negascout(board *chess.Board, depth int, alpha int, beta int, turn int, nul
 		}
 		Unmake(unmakeFunc)
 		if score > alpha {
-			//moveOrdering.StoreHistoryMove(move, board, depth)
 			StorePV(move)
 			bestmove = move
 			hashFlag = HashFlagExact

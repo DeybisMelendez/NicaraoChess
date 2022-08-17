@@ -129,6 +129,7 @@ func goCommand(command string) {
 		}
 		start := time.Now().UnixMilli()
 		if moveTime != -1 && movesToGo == -1 {
+			//TODO:Implementar un mejor control de tiempo
 			/*var timeTotal int64 = int64(clock) - 50
 			movetime := timeTotal/int64(movesToGo) + int64(inc)
 			if inc > 0 && timeTotal < int64(5*inc) {

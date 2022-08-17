@@ -32,7 +32,6 @@ func InitHasTable() {
 
 func WriteHashEntry(hash uint64, score int, depth int, flag int, move chess.Move) {
 	index := (hash & 0x7fffffff) % hashEntries
-	//var entry hashEntry = hashTable[(]
 	if score < -MateScore {
 		score -= Ply
 	} else if score > MateScore {
@@ -71,8 +70,6 @@ func ReadHashEntry(hash uint64, alpha int, beta int, depth int, move *chess.Move
 }
 
 func SetHashTable(mb uint64) {
-	//var newHashTable []hashEntry
-	//hashTable = newHashTable
 	if mb < 4 {
 		Mb = 4
 	} else if mb > 128 {

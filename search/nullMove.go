@@ -16,7 +16,7 @@ func NullMove(fen string, depth int, beta int, turn int) int {
 		return 0
 	}
 	score := 0
-	//if  { //Condicionar a que no se ejecute en finales
+	// Condicionar a que no se ejecute en finales
 	if strings.Contains(fen, " w ") {
 		fen = strings.ReplaceAll(fen, " w ", " b ")
 	} else {

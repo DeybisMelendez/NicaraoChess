@@ -257,20 +257,3 @@ func pstMake() [3][2][6][64]int {
 	pst := [3][2][6][64]int{og, mg, eg}
 	return pst
 }
-
-/*func PSTEval(board *chess.Board) int {
-	white, black := 0, 0
-	for i := 0; i < 64; i++ {
-		piece, isWhite := utils.GetPiece(uint8(i), board)
-		if piece != 0 {
-			//TODO revisar
-			if isWhite {
-				white += PST[0][piece-1][i]
-			} else {
-				black += PST[0][6+piece-1][i]
-			}
-		}
-	}
-	return white - black
-}
-*/

@@ -8,6 +8,11 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
+var MaterialWeightOP = [6]int{100, 300, 300, 500, 1000, 10000}
+var MaterialWeightMG = [6]int{100, 320, 330, 500, 900, 10000}
+var MaterialWeightEG = [6]int{120, 320, 350, 550, 900, 10000}
+var MaterialScore = [3][6]int{MaterialWeightOP, MaterialWeightMG, MaterialWeightEG}
+
 const MiddleGamePhaseScore = 7300 //16xP + 4xB + 4xN + 4xR + 2xQ - R - 2xP
 const EndGamePhaseScore = 1800    // 2Q
 var phase = 1                     // 0 opening, 1 middlegame, 2 endgame
@@ -29,13 +34,6 @@ func Evaluate(board *chess.Board, turn int) int {
 	} else if (piecesCount < 16 && queens == 0) || queens < 2 {
 		phase = 2
 	}
-
-	/*minorPieces := (utils.NumOfSetBits(board.White.Knights) + utils.NumOfSetBits(board.White.Bishops) +
-		utils.NumOfSetBits(board.White.Rooks) + utils.NumOfSetBits(board.Black.Knights) +
-		utils.NumOfSetBits(board.Black.Bishops) + utils.NumOfSetBits(board.Black.Rooks))
-	if queens == 0 || (minorPieces < 4 && queens > 0) {
-		phase = 2
-	}*/
 	score := 0
 	for i := 0; i < 64; i++ {
 		piece, isWhite := utils.GetPiece(uint8(i), board)
@@ -54,11 +52,7 @@ func Evaluate(board *chess.Board, turn int) int {
 			}
 		}
 	}
-	/*if board.Wtomove {
-		return score
-	}
-	return -score*/
-	return score * turn //eval * color
+	return score * turn
 }
 
 func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
@@ -90,8 +84,6 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		if score >= beta {
 			return beta
 		}
-
-		//alpha = utils.Max(alpha, score)
 	}
 	return alpha
 }
@@ -103,7 +95,6 @@ func filterCaptures(moves []chess.Move, board *chess.Board) []chess.Move {
 			filteredCaptures = append(filteredCaptures, moves[i])
 		}
 	}
-	//filteredCaptures = moveOrdering.SortMoves(filteredCaptures, board, PVTable[0][Ply], 0, Ply)
 	sort.Slice(filteredCaptures, func(a, b int) bool {
 		valueA := moveOrdering.GetMVV_LVA(filteredCaptures[a], board)
 		valueB := moveOrdering.GetMVV_LVA(filteredCaptures[b], board)
