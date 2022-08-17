@@ -9,9 +9,11 @@ var Stopped bool = false
 
 const MaxPly int = 64
 
-var Mate int = 4000
+//var Mate int = 4000
 
 const MateScore = 4000
+
+var MateValue = 5000
 
 var Bestmove chess.Move
 
@@ -20,5 +22,5 @@ func ResetGlobalVariables() {
 	Nodes = 0
 	//StopTime = -1
 	Stopped = false
-	//eval.ResetMaterial()
+	MateValue = 5000
 }

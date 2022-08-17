@@ -32,6 +32,11 @@ func InitHasTable() {
 
 func WriteHashEntry(hash uint64, score int, depth int, flag int, move chess.Move) {
 	var entry hashEntry = hashTable[(hash&0x7fffffff)%hashEntries]
+	if score < -MateScore {
+		score -= Ply
+	} else if score > MateScore {
+		score += Ply
+	}
 	entry.hash = hash
 	entry.depth = depth
 	entry.score = score
@@ -44,6 +49,11 @@ func ReadHashEntry(hash uint64, alpha int, beta int, depth int) (int, chess.Move
 	if entry.hash == hash {
 		if entry.depth >= depth {
 			var score int = entry.score
+			if score < -MateScore {
+				score += Ply
+			} else if score > MateScore {
+				score -= Ply
+			}
 			if entry.flag == HashFlagExact {
 				return entry.score, entry.bestmove
 			}

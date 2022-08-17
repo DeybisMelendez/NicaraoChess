@@ -43,8 +43,8 @@ func Checkmate(board *chess.Board) bool {
 func GetPiece(square uint8, board *chess.Board) (int, bool) {
 	squareMask := uint64(1) << square
 	piece := chess.Nothing
-	w := &board.White
-	b := &board.Black
+	w := board.White
+	b := board.Black
 	var isWhite bool = true
 	if w.Pawns&squareMask != 0 {
 		piece = chess.Pawn

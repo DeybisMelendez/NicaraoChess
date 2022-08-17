@@ -11,15 +11,15 @@ var PVTable [MaxPly][MaxPly]chess.Move
 func StorePV(move chess.Move) {
 	// Triangular PV Table
 	// escribe el actual pv
-	if Ply < 63 {
-		PVTable[Ply][Ply] = move
-		// escribimos desde la capa mas profunda hasta la actual
-		for nextPly := Ply + 1; nextPly < PVLength[Ply+1]; nextPly++ {
-			PVTable[Ply][nextPly] = PVTable[Ply+1][nextPly]
-		}
-		// ajuste pv length
-		PVLength[Ply] = PVLength[Ply+1]
+	//if Ply < 62 {
+	PVTable[Ply][Ply] = move
+	// escribimos desde la capa mas profunda hasta la actual
+	for nextPly := Ply + 1; nextPly < PVLength[Ply+1]; nextPly++ {
+		PVTable[Ply][nextPly] = PVTable[Ply+1][nextPly]
 	}
+	// ajuste pv length
+	PVLength[Ply] = PVLength[Ply+1]
+	//}
 
 }
 

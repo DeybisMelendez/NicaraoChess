@@ -2,15 +2,13 @@ package search
 
 // Late Move Reduction
 import (
-	"math"
-
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
 const FullDepthMove = 6
 
 func pvReduction(depth int) int {
-	return int(math.Round(float64(depth) / 3.0))
+	return int(float32(depth) / 3.0)
 }
 
 func isLMROk(board *chess.Board, move chess.Move) bool {

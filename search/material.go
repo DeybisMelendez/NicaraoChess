@@ -7,7 +7,7 @@ import (
 )
 
 var MaterialWeightMG = [7]int{0, 100, 320, 330, 500, 900, 10000}
-var MaterialWeightEG = [7]int{0, 120, 320, 350, 550, 900}
+var MaterialWeightEG = [7]int{0, 120, 320, 350, 550, 900, 10000}
 
 //var MaterialMG int = 0
 //var lastMaterial int = 0
@@ -15,7 +15,7 @@ var MaterialWeightEG = [7]int{0, 120, 320, 350, 550, 900}
 func ValueMaterial(board *chess.Board) int {
 	var white int = 0
 	var black int = 0
-	for i := 0; i < 63; i++ {
+	for i := 0; i < 64; i++ {
 		piece, isWhite := utils.GetPiece(uint8(i), board)
 		if isWhite {
 			white += MaterialWeightMG[piece]

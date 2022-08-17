@@ -11,7 +11,7 @@ import (
 
 func Search(board *chess.Board, stopTime int64, depth int) {
 	score := 0
-	//InitHasTable()
+	InitHasTable()
 	ResetPVTable()
 	ResetGlobalVariables()
 	moveOrdering.ResetKillerMoves()
@@ -23,19 +23,20 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	beta := infinity
 	StopTime = stopTime
 	currDepth := 1
-	color := -1
+	/*color := -1
 	//var bestmove chess.Move
 	if board.Wtomove {
 		color = 1
-	}
+	}*/
 	for {
 		// TODO detener en jaque mate
 		if depth == 0 {
 			break
 		}
-		Mate = MateScore
+		//Mate = MateScore
+		moveOrdering.FollowPV = true
 		//eval.GetMaterial(board)
-		score = Negascout(board, currDepth, color, alpha, beta)
+		score = Negascout(board, currDepth, alpha, beta)
 		if isTimeToStop() {
 			break
 		}
@@ -56,7 +57,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	fmt.Println(toPrint)
 }
 
-func Negascout(board *chess.Board, depth int, color int, alpha int, beta int) int {
+func Negascout(board *chess.Board, depth int, alpha int, beta int) int {
 	if isTimeToStop() {
 		return 0
 	}
@@ -66,40 +67,57 @@ func Negascout(board *chess.Board, depth int, color int, alpha int, beta int) in
 		//StorePV(bestmove)
 		return hashScore
 	}
-	var hashFlag int = HashFlagAlpha
-	var moveList []chess.Move = moveOrdering.SortMoves(board.GenerateLegalMoves(), board, PVTable[0], bestmove, color, Ply)
+	list := board.GenerateLegalMoves()
+	var moveList []chess.Move = moveOrdering.SortMoves(list, board, PVTable[0], bestmove, Ply)
 	//var moveList []chess.Move = board.GenerateLegalMoves()
-	var score int = 0
-
 	if depth == 0 || len(moveList) == 0 {
-		return Quiesce(board, color, alpha, beta) //eval.Evaluate(board, color) //
+		return Quiesce(board, alpha, beta) //eval.Evaluate(board) //
 	}
+	// Mate Distance pruning
+	if alpha < -MateScore {
+		alpha = -MateScore
+	}
+	if beta > MateScore-1 {
+		beta = MateScore - 1
+	}
+	if alpha >= beta {
+		return alpha
+	}
+	var hashFlag int = HashFlagAlpha
+	var score int = 0
+	/*if nullMove {
+		nullScore := NullMove(*board, board.OurKingInCheck(), depth, alpha, beta)
+		if nullScore != NullMoveFails {
+			return beta
+		}
+	}*/
 	for i := 0; i < len(moveList); i++ {
 		move := moveList[i]
 		unmakeFunc := Make(board, move)
 		if i > FullDepthMove && isLMROk(board, move) {
-			score = -Negascout(board, pvReduction(depth), -color, -alpha-1, -alpha)
-			if score > alpha && score < beta {
+			score = -Negascout(board, pvReduction(depth), -alpha-1, -alpha)
+			if score > alpha {
 				////https://www.chessprogramming.org/NegaScout#Guido_Schimmels
-				var score2 int = -Negascout(board, depth-1, -color, -beta, -alpha)
+				var score2 int = -Negascout(board, depth-1, -beta, -alpha)
 				score = utils.Max(score, score2)
 			}
 		} else {
-			score = -Negascout(board, depth-1, -color, -beta, -alpha)
+			score = -Negascout(board, depth-1, -beta, -alpha)
 		}
 		Unmake(unmakeFunc)
+		if score > alpha {
+			StorePV(move)
+			bestmove = move
+			moveOrdering.StoreHistoryMove(move, board, depth)
+			hashFlag = HashFlagExact
+			alpha = score
+		}
 		if score >= beta {
 			moveOrdering.StoreKillerMove(move, board, Ply)
 			WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta, move)
 			return beta
 		}
-		if score > alpha {
-			StorePV(move)
-			bestmove = move
-			moveOrdering.StoreHistoryMove(move, board, depth, color)
-			hashFlag = HashFlagExact
-			alpha = score
-		}
+
 	}
 	WriteHashEntry(board.Hash(), beta, depth, hashFlag, bestmove)
 	return alpha
