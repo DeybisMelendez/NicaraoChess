@@ -12,14 +12,15 @@ var FollowPV bool = true
 func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, color int, ply int) int {
 	// PV Move : 2000
 	// Killer Moves : 900-1650
-	// History Move : value*10
+	// History Move : value*100
 	// MVV-LVA : 0-650
+	// 0-60 Pawn - King
 	if move == bestmove {
 		return 3000
 	}
 	if ply > 0 && FollowPV {
 		FollowPV = false
-		if move == pvMove {
+		if &move == &pvMove {
 			FollowPV = true
 			return 2000
 		}
@@ -33,7 +34,7 @@ func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove 
 	piece, _ := utils.GetPiece(move.From(), board)
 	historyMove := GetHistoryMove(color, piece, move.From())
 	if historyMove != 0 {
-		return historyMove * 10
+		return historyMove * 100
 	}
 	return getMVV_LVA(move, board)
 }

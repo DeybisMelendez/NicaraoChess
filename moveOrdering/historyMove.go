@@ -15,9 +15,9 @@ func StoreHistoryMove(move chess.Move, board *chess.Board, depth int) {
 	}
 	piece, _ := utils.GetPiece(move.From(), board)
 	if color == 1 {
-		historyMoves[0][piece][move.From()] += depth * depth
+		historyMoves[0][piece][move.From()] += depth
 	} else {
-		historyMoves[1][piece][move.From()] += depth * depth
+		historyMoves[1][piece][move.From()] += depth
 	}
 }
 

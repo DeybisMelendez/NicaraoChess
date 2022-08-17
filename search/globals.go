@@ -2,6 +2,8 @@ package search
 
 import chess "github.com/dylhunn/dragontoothmg"
 
+const Delta = 200
+
 var Ply int = 0
 var Nodes int = 0
 var StopTime int64 = -1

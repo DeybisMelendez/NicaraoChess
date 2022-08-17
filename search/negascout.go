@@ -85,12 +85,12 @@ func Negascout(board *chess.Board, depth int, alpha int, beta int) int {
 	}
 	var hashFlag int = HashFlagAlpha
 	var score int = 0
-	/*if nullMove {
-		nullScore := NullMove(*board, board.OurKingInCheck(), depth, alpha, beta)
+	if !board.OurKingInCheck() {
+		nullScore := NullMove(board.ToFen(), depth, beta)
 		if nullScore != NullMoveFails {
 			return beta
 		}
-	}*/
+	}
 	for i := 0; i < len(moveList); i++ {
 		move := moveList[i]
 		unmakeFunc := Make(board, move)

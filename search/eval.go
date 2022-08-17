@@ -36,6 +36,10 @@ func Quiesce(board *chess.Board, alpha int, beta int) int {
 	if standPat > beta {
 		return beta
 	}
+	// Delta pruning
+	if standPat < alpha-Delta {
+		return alpha
+	}
 	alpha = utils.Max(alpha, standPat)
 	moves := filterCaptures(board.GenerateLegalMoves(), board)
 	var score int = 0
