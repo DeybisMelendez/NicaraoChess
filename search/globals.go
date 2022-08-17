@@ -9,8 +9,6 @@ var Nodes int = 0
 var StopTime int64 = -1
 var Stopped bool = false
 
-const MaxPly int = 64
-
 //var Mate int = 4000
 
 const MateScore = 4000

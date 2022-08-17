@@ -1,5 +1,0 @@
-package search
-
-func IterativeDeepening() {
-
-}

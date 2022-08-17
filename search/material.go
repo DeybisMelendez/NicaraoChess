@@ -1,30 +1,27 @@
 package search
 
-import (
-	"nicarao/utils"
-
-	chess "github.com/dylhunn/dragontoothmg"
-)
-
-var MaterialWeightMG = [7]int{0, 100, 320, 330, 500, 900, 10000}
-var MaterialWeightEG = [7]int{0, 120, 320, 350, 550, 900, 10000}
+var MaterialWeightOP = [6]int{100, 300, 300, 500, 1000, 10000}
+var MaterialWeightMG = [6]int{100, 320, 330, 500, 900, 10000}
+var MaterialWeightEG = [6]int{120, 320, 350, 550, 900, 10000}
+var MaterialScore = [3][6]int{MaterialWeightOP, MaterialWeightMG, MaterialWeightEG}
 
 //var MaterialMG int = 0
 //var lastMaterial int = 0
 
-func ValueMaterial(board *chess.Board) int {
-	var white int = 0
-	var black int = 0
+/*func ValueMaterial(board *chess.Board) (int, int) {
+	var whiteMG, blackMG, whiteEG, blackEG int
 	for i := 0; i < 64; i++ {
 		piece, isWhite := utils.GetPiece(uint8(i), board)
 		if isWhite {
-			white += MaterialWeightMG[piece]
+			whiteMG += MaterialWeightMG[piece]
+			whiteEG += MaterialWeightEG[piece]
 		} else {
-			black += MaterialWeightMG[piece]
+			blackMG += MaterialWeightMG[piece]
+			blackEG += MaterialWeightEG[piece]
 		}
 	}
-	return white - black
-}
+	return (whiteMG - blackMG), (whiteEG - blackEG)
+}*/
 
 /*func UpdateMaterial(board *chess.Board, move chess.Move) {
 	capture, isWhite := utils.GetPiece(move.To(), board)

@@ -34,7 +34,7 @@ var MVV_LVA = [7][7]int{ //[Victims][Agressors]
 	},
 }
 
-func getMVV_LVA(move chess.Move, board *chess.Board) int {
+func GetMVV_LVA(move chess.Move, board *chess.Board) int {
 	agressor, _ := utils.GetPiece(move.From(), board)
 	victim, _ := utils.GetPiece(move.To(), board)
 	return MVV_LVA[victim][agressor]

@@ -7,40 +7,44 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-var FollowPV bool = true
+//var FollowPV bool = false
+//var ScorePV bool = false
 
 func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, color int, ply int) int {
-	// PV Move : 2000
-	// Killer Moves : 900-1650
+	// Hash Bestmove 6000
+	// PV Move : 5000
+	// Killer Moves : 2000-3650
 	// History Move : value*100
 	// MVV-LVA : 0-650
-	// 0-60 Pawn - King
+	score := 0
 	if move == bestmove {
-		return 3000
+		score += 6000000
 	}
-	if ply > 0 && FollowPV {
-		FollowPV = false
-		if &move == &pvMove {
-			FollowPV = true
-			return 2000
-		}
+	//if ply > 0 && FollowPV {
+	//	FollowPV = false
+	if move == pvMove {
+		//FollowPV = true
+		score += 3000000
 	}
+	//}
 	if KillerMoves[0][ply] == move {
-		return getMVV_LVA(move, board) + 1000
-	}
-	if KillerMoves[1][ply] == move {
-		return getMVV_LVA(move, board) + 900
+		score += 2000000
+	} else if KillerMoves[1][ply] == move {
+		score += 1000000
 	}
 	piece, _ := utils.GetPiece(move.From(), board)
 	historyMove := GetHistoryMove(color, piece, move.From())
 	if historyMove != 0 {
-		return historyMove * 100
+		//fmt.Println(historyMove)
+		//score += historyMove + 10000
 	}
-	return getMVV_LVA(move, board)
+	//if score == 0 {
+	score += GetMVV_LVA(move, board)
+	//}
+	return score
 }
 
-func SortMoves(moves []chess.Move, board *chess.Board, pvTable [64]chess.Move, bestmove chess.Move, ply int) []chess.Move {
-	pvMove := pvTable[ply]
+func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmove chess.Move, ply int) []chess.Move {
 	color := -1
 	if board.Wtomove {
 		color = 1

@@ -31,20 +31,21 @@ func InitHasTable() {
 }
 
 func WriteHashEntry(hash uint64, score int, depth int, flag int, move chess.Move) {
-	var entry hashEntry = hashTable[(hash&0x7fffffff)%hashEntries]
+	index := (hash & 0x7fffffff) % hashEntries
+	//var entry hashEntry = hashTable[(]
 	if score < -MateScore {
 		score -= Ply
 	} else if score > MateScore {
 		score += Ply
 	}
-	entry.hash = hash
-	entry.depth = depth
-	entry.score = score
-	entry.flag = flag
-	entry.bestmove = move
+	hashTable[index].hash = hash
+	hashTable[index].depth = depth
+	hashTable[index].score = score
+	hashTable[index].flag = flag
+	hashTable[index].bestmove = move
 }
 
-func ReadHashEntry(hash uint64, alpha int, beta int, depth int) (int, chess.Move) {
+func ReadHashEntry(hash uint64, alpha int, beta int, depth int, move *chess.Move) int {
 	var entry hashEntry = hashTable[(hash&0x7fffffff)%hashEntries]
 	if entry.hash == hash {
 		if entry.depth >= depth {
@@ -55,17 +56,18 @@ func ReadHashEntry(hash uint64, alpha int, beta int, depth int) (int, chess.Move
 				score -= Ply
 			}
 			if entry.flag == HashFlagExact {
-				return entry.score, entry.bestmove
+				return entry.score
 			}
 			if entry.flag == HashFlagAlpha && score <= alpha {
-				return alpha, entry.bestmove
+				return alpha
 			}
 			if entry.flag == HashFlagBeta && score >= beta {
-				return beta, entry.bestmove
+				return beta
 			}
 		}
+		*move = entry.bestmove
 	}
-	return NoHashEntry, 0
+	return NoHashEntry
 }
 
 func SetHashTable(mb uint64) {

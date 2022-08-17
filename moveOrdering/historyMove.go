@@ -9,16 +9,19 @@ import (
 var historyMoves [2][7][64]int
 
 func StoreHistoryMove(move chess.Move, board *chess.Board, depth int) {
-	color := -1
-	if board.Wtomove {
-		color = 1
+	if !chess.IsCapture(move, board) {
+		color := -1
+		if board.Wtomove {
+			color = 1
+		}
+		piece, _ := utils.GetPiece(move.From(), board)
+		if color == 1 {
+			historyMoves[0][piece][move.From()] += depth * depth
+		} else {
+			historyMoves[1][piece][move.From()] += depth * depth
+		}
 	}
-	piece, _ := utils.GetPiece(move.From(), board)
-	if color == 1 {
-		historyMoves[0][piece][move.From()] += depth
-	} else {
-		historyMoves[1][piece][move.From()] += depth
-	}
+
 }
 
 func GetHistoryMove(color int, piece int, square uint8) int {

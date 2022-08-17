@@ -3,11 +3,15 @@ package search
 import (
 	"nicarao/moveOrdering"
 	"nicarao/utils"
+	"sort"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-func Evaluate(board *chess.Board) int {
+const MiddleGamePhaseScore = 7300 //16xP + 4xB + 4xN + 4xR + 2xQ - R - 2xP
+const EndGamePhaseScore = 1800    // 2Q
+var phase = 1                     // 0 opening, 1 middlegame, 2 endgame
+func Evaluate(board *chess.Board, turn int) int {
 	moves := board.GenerateLegalMoves()
 	if len(moves) == 0 {
 		if board.OurKingInCheck() {
@@ -18,21 +22,50 @@ func Evaluate(board *chess.Board) int {
 			return 0
 		}
 	}
-	eval := 0
-	//GetMaterial(board)
-	eval += ValueMaterial(board)
-	eval += PSTEval(board)
-	if board.Wtomove {
-		return eval
+	piecesCount := getPiecesCount(board)
+	queens := utils.NumOfSetBits(board.White.Queens) + utils.NumOfSetBits(board.Black.Queens)
+	if piecesCount > 28 {
+		phase = 0 //Opening
+	} else if (piecesCount < 16 && queens == 0) || queens < 2 {
+		phase = 2
 	}
-	return -eval //eval * color
+
+	/*minorPieces := (utils.NumOfSetBits(board.White.Knights) + utils.NumOfSetBits(board.White.Bishops) +
+		utils.NumOfSetBits(board.White.Rooks) + utils.NumOfSetBits(board.Black.Knights) +
+		utils.NumOfSetBits(board.Black.Bishops) + utils.NumOfSetBits(board.Black.Rooks))
+	if queens == 0 || (minorPieces < 4 && queens > 0) {
+		phase = 2
+	}*/
+	score := 0
+	for i := 0; i < 64; i++ {
+		piece, isWhite := utils.GetPiece(uint8(i), board)
+		if piece != chess.Nothing {
+			color := 1
+			material, pst := 0, 0
+			if isWhite {
+				color = 0
+			}
+			material = MaterialScore[phase][piece-1]
+			pst = PST[phase][color][piece-1][i]
+			if isWhite {
+				score += material + pst
+			} else {
+				score -= (material + pst)
+			}
+		}
+	}
+	/*if board.Wtomove {
+		return score
+	}
+	return -score*/
+	return score * turn //eval * color
 }
 
-func Quiesce(board *chess.Board, alpha int, beta int) int {
+func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 	if isTimeToStop() {
 		return 0
 	}
-	standPat := Evaluate(board)
+	standPat := Evaluate(board, turn)
 	if standPat > beta {
 		return beta
 	}
@@ -48,7 +81,7 @@ func Quiesce(board *chess.Board, alpha int, beta int) int {
 			return 0
 		}
 		unmakeFunc := Make(board, moves[i])
-		score = -Quiesce(board, -beta, -alpha)
+		score = -Quiesce(board, -beta, -alpha, -turn)
 		Unmake(unmakeFunc)
 		if score > alpha {
 			StorePV(moves[i])
@@ -70,6 +103,15 @@ func filterCaptures(moves []chess.Move, board *chess.Board) []chess.Move {
 			filteredCaptures = append(filteredCaptures, moves[i])
 		}
 	}
-	filteredCaptures = moveOrdering.SortMoves(filteredCaptures, board, PVTable[0], 0, Ply)
+	//filteredCaptures = moveOrdering.SortMoves(filteredCaptures, board, PVTable[0][Ply], 0, Ply)
+	sort.Slice(filteredCaptures, func(a, b int) bool {
+		valueA := moveOrdering.GetMVV_LVA(filteredCaptures[a], board)
+		valueB := moveOrdering.GetMVV_LVA(filteredCaptures[b], board)
+		return valueA > valueB
+	})
 	return filteredCaptures
+}
+
+func getPiecesCount(board *chess.Board) uint64 {
+	return utils.NumOfSetBits(board.White.All) + utils.NumOfSetBits(board.Black.All)
 }

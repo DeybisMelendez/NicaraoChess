@@ -76,3 +76,11 @@ func GetPiece(square uint8, board *chess.Board) (int, bool) {
 	}
 	return piece, isWhite
 }
+func NumOfSetBits(n uint64) uint64 {
+	var count uint64
+	for n != 0 {
+		count += n & 1
+		n >>= 1
+	}
+	return count
+}

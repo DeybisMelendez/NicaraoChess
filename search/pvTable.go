@@ -5,8 +5,8 @@ import (
 )
 
 // posiblemente tenga que completar el pvmove si no funciona correctamente, falta followPV
-var PVLength [MaxPly]int
-var PVTable [MaxPly][MaxPly]chess.Move
+var PVLength [64]int
+var PVTable [64][64]chess.Move
 
 func StorePV(move chess.Move) {
 	// Triangular PV Table
@@ -24,8 +24,8 @@ func StorePV(move chess.Move) {
 }
 
 func ResetPVTable() {
-	var newPVLength [MaxPly]int
-	var newPVTable [MaxPly][MaxPly]chess.Move
+	var newPVLength [64]int
+	var newPVTable [64][64]chess.Move
 	PVLength = newPVLength
 	PVTable = newPVTable
 	/*for i := 0; i < len(PVLength); i++ {
