@@ -1,5 +1,6 @@
 package search
 
+//TODO Muy Lento para implementarlo en la evaluación!!!
 import (
 	"nicarao/utils"
 	"strings"

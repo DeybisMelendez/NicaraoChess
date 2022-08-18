@@ -31,7 +31,7 @@ func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove 
 	return score
 }
 
-func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmove chess.Move, ply int) []chess.Move {
+func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmove chess.Move, ply int) {
 	color := -1
 	if board.Wtomove {
 		color = 1
@@ -41,5 +41,4 @@ func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmo
 		valueB := valueMove(board, moves[b], pvMove, bestmove, color, ply)
 		return valueA > valueB
 	})
-	return moves
 }

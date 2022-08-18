@@ -1,56 +1,12 @@
 package search
 
 import (
-	"fmt"
 	"nicarao/moveOrdering"
 	"nicarao/utils"
 	"time"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
-
-func clearSearch() {
-	InitHasTable()
-	ResetPVTable()
-	ResetGlobalVariables()
-	moveOrdering.ResetKillerMoves()
-	moveOrdering.ResetHistoryMove()
-}
-
-func Search(board *chess.Board, stopTime int64, depth int) {
-	score := 0
-	clearSearch()
-	const infinity = 10000
-	alpha := -infinity
-	beta := infinity
-	StopTime = stopTime
-	currDepth := 1
-	turn := -1
-	if board.Wtomove {
-		turn = 1
-	}
-	for {
-		// TODO detener en jaque mate
-		if depth == 0 {
-			break
-		}
-		score = Negascout(board, currDepth, alpha, beta, turn, DoNull)
-		if isTimeToStop() {
-			break
-		}
-		Bestmove = PVTable[0][0]
-		fmt.Println("info",
-			"depth", currDepth,
-			"score cp", score,
-			"nodes", Nodes,
-			"pv", FormatPV(PVTable[0]))
-		ResetGlobalVariables()
-		depth--
-		currDepth++
-	}
-	toPrint := "bestmove " + Bestmove.String()
-	fmt.Println(toPrint)
-}
 
 func Negascout(board *chess.Board, depth int, alpha int, beta int, turn int, nullMove bool) int {
 	if isTimeToStop() {
@@ -62,8 +18,11 @@ func Negascout(board *chess.Board, depth int, alpha int, beta int, turn int, nul
 	if hashScore != NoHashEntry && Ply > 0 {
 		return hashScore
 	}
-	list := board.GenerateLegalMoves()
-	var moveList []chess.Move = moveOrdering.SortMoves(list, board, PVTable[0][Ply], bestmove, Ply)
+	moveList := board.GenerateLegalMoves()
+	//list := board.GenerateLegalMoves()
+	//var moveList []chess.Move = moveOrdering.SortMoves(list, board, PVTable[0][Ply], bestmove, Ply)
+	moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
+
 	if depth == 0 || len(moveList) == 0 {
 		return Quiesce(board, alpha, beta, turn) //eval.Evaluate(board) //
 	}
@@ -128,4 +87,10 @@ func isTimeToStop() bool {
 		}
 	}
 	return false
+}
+
+func ResetGlobalVariables() {
+	Ply = 0
+	Nodes = 0
+	Stopped = false
 }

@@ -13,9 +13,11 @@ var MaterialWeightMG = [6]int{100, 320, 330, 500, 900, 10000}
 var MaterialWeightEG = [6]int{120, 320, 350, 550, 900, 10000}
 var MaterialScore = [3][6]int{MaterialWeightOP, MaterialWeightMG, MaterialWeightEG}
 
+const Delta = 200
 const MiddleGamePhaseScore = 7300 //16xP + 4xB + 4xN + 4xR + 2xQ - R - 2xP
-const EndGamePhaseScore = 1800    // 2Q
-var phase = 1                     // 0 opening, 1 middlegame, 2 endgame
+// const EndGamePhaseScore = 1800    // 2Q
+var phase = 1 // 0 opening, 1 middlegame, 2 endgame
+
 func Evaluate(board *chess.Board, turn int) int {
 	moves := board.GenerateLegalMoves()
 	if len(moves) == 0 {
@@ -32,11 +34,11 @@ func Evaluate(board *chess.Board, turn int) int {
 	if piecesCount > 28 {
 		phase = 0 //Opening
 	} else if (piecesCount < 16 && queens == 0) || queens < 2 {
-		phase = 2
+		phase = 2 // Endgame
 	}
 	score := 0
-	for i := 0; i < 64; i++ {
-		piece, isWhite := utils.GetPiece(uint8(i), board)
+	for i := uint8(0); i < 64; i++ {
+		piece, isWhite := utils.GetPiece(i, board)
 		if piece != chess.Nothing {
 			color := 1
 			material, pst := 0, 0
