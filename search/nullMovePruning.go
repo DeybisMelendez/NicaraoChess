@@ -24,7 +24,7 @@ func NullMove(fen string, depth int, beta int, turn int) int {
 	}
 	nullBoard := chess.ParseFen(fen)
 	if !nullBoard.OurKingInCheck() && len(nullBoard.GenerateLegalMoves()) != 0 {
-		score = -Negascout(&nullBoard, depth-1-NullMoveR, -beta, -beta+1, -turn, NoNull)
+		score = -Negamax(&nullBoard, depth-1-NullMoveR, -beta, -beta+1, -turn, NoNull)
 		if score >= beta {
 			return beta
 		}

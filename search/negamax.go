@@ -8,7 +8,7 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-func Negascout(board *chess.Board, depth int, alpha int, beta int, turn int, nullMove bool) int {
+func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullMove bool) int {
 	if isTimeToStop() {
 		return 0
 	}
@@ -84,9 +84,9 @@ func Negascout(board *chess.Board, depth int, alpha int, beta int, turn int, nul
 			continue
 		}
 		if i > FullDepthMove && isLMROk(board, move) {
-			score = -Negascout(board, pvReduction(depth), -beta, -alpha, -turn, DoNull)
+			score = -Negamax(board, pvReduction(depth), -beta, -alpha, -turn, DoNull)
 		} else {
-			score = -Negascout(board, depth-1, -beta, -alpha, -turn, DoNull)
+			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		}
 		Unmake(unmakeFunc)
 		if score > alpha {
