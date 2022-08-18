@@ -69,4 +69,5 @@ func clearSearch() {
 	ResetPVTable()
 	ResetGlobalVariables()
 	moveOrdering.ResetKillerMoves()
+	moveOrdering.ResetHistoryMove()
 }

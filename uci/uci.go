@@ -87,37 +87,42 @@ func position(command string) {
 
 func goCommand(command string) {
 	if !strings.Contains(command, "infinite") {
-		clock := -1
+		var clock int64 = -1
 		var stopTime int64 = -1
 		depth := -1
-		movesToGo := -1
+		var movesToGo int64 = 50
 		var moveTime int64 = -1
-		inc := 0
+		var inc int64 = 0
 		goCommand := strings.Fields(command)
 		len := len(goCommand)
 		if len > 1 {
 			if goCommand[1] == "wtime" && board.Wtomove {
-				clock, _ = strconv.Atoi(goCommand[2])
+				x, _ := strconv.Atoi(goCommand[2])
+				clock = int64(x)
 			}
 		}
 		if len > 3 {
 			if goCommand[3] == "btime" && !board.Wtomove {
-				clock, _ = strconv.Atoi(goCommand[4])
+				x, _ := strconv.Atoi(goCommand[4])
+				clock = int64(x)
 			}
 		}
 		if len > 5 {
 			if goCommand[5] == "winc" && board.Wtomove {
-				inc, _ = strconv.Atoi(goCommand[6])
+				x, _ := strconv.Atoi(goCommand[6])
+				inc = int64(x)
 			}
 		}
 		if len > 7 {
 			if goCommand[7] == "binc" && !board.Wtomove {
-				inc, _ = strconv.Atoi(goCommand[8])
+				x, _ := strconv.Atoi(goCommand[8])
+				inc = int64(x)
 			}
 		}
 		if len > 9 {
 			if goCommand[9] == "movestogo" {
-				movesToGo, _ = strconv.Atoi(goCommand[10])
+				x, _ := strconv.Atoi(goCommand[10])
+				movesToGo = int64(x)
 			}
 		}
 		if goCommand[1] == "movetime" {
@@ -128,14 +133,18 @@ func goCommand(command string) {
 			depth, _ = strconv.Atoi(goCommand[2])
 		}
 		start := time.Now().UnixMilli()
-		if moveTime != -1 && movesToGo == -1 {
+		if moveTime != -1 {
 			//TODO:Implementar un mejor control de tiempo
 			/*var timeTotal int64 = int64(clock) - 50
 			movetime := timeTotal/int64(movesToGo) + int64(inc)
 			if inc > 0 && timeTotal < int64(5*inc) {
 				movetime = int64(75 * inc / 100)
 			}*/
-			stopTime = start + moveTime //ajuste
+			stopTime = start + moveTime
+		}
+		if clock != -1 {
+			timeleft := (clock-50)/movesToGo + inc
+			stopTime = start + timeleft
 		}
 		if depth == -1 {
 			depth = 64

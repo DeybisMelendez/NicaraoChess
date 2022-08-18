@@ -15,14 +15,13 @@ func StoreHistoryMove(move chess.Move, board *chess.Board, depth int) {
 		if board.Wtomove {
 			color = 1
 		}
-		piece, _ := utils.GetPiece(move.From(), board)
+		piece, _ := utils.GetPiece(move.To(), board)
 		if color == 1 {
-			historyMoves[0][piece][move.From()] += depth * depth
+			historyMoves[0][piece][move.To()] += depth
 		} else {
-			historyMoves[1][piece][move.From()] += depth * depth
+			historyMoves[1][piece][move.To()] += depth
 		}
 	}
-
 }
 
 func GetHistoryMove(color int, piece int, square uint8) int {
