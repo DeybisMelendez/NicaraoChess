@@ -143,9 +143,7 @@ func Evaluate(board *chess.Board, turn int) int {
 	}
 	phase = ((phase * 256) + (TotalPhase / 2)) / TotalPhase
 	score := ((opening * (256 - phase)) + (opening * phase)) / 256
-	minorPieces := getMinorPieces(board)
-	queens := bits.OnesCount64(board.White.Queens | board.Black.Queens)
-	if (minorPieces < 4 && queens < 2) || queens == 0 {
+	if isEndgame(board) {
 		return endgame * turn // Endgame
 	}
 	return score * turn
@@ -203,4 +201,13 @@ func getMinorPieces(board *chess.Board) int {
 	bin := board.White.Knights | board.White.Bishops | board.White.Rooks |
 		board.Black.Knights | board.Black.Bishops | board.Black.Rooks
 	return bits.OnesCount64(bin)
+}
+
+func isEndgame(board *chess.Board) bool {
+	minorPieces := getMinorPieces(board)
+	queens := bits.OnesCount64(board.White.Queens | board.Black.Queens)
+	if (minorPieces < 4 && queens < 2) || queens == 0 {
+		return true
+	}
+	return false
 }

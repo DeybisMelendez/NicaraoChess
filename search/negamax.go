@@ -44,7 +44,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	}
 	if !inCheck && !isPVNode {
 		staticEval := Evaluate(board, turn)
-		if nullMove {
+		if nullMove && !isEndgame(board) {
 			if Ply > 0 && depth > NullMoveR && staticEval >= beta {
 				nullScore := NullMove(board.ToFen(), depth, beta, turn)
 				if nullScore != NullMoveFails {
