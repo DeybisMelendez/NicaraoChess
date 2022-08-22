@@ -153,10 +153,7 @@ func BadQueen(board *chess.Board, byBlack bool, square uint8) int {
 }
 
 func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool) int {
-	if !isEndgame { // Opening
-		return MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)*2
-	}
-	return 0
+	return MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)*2
 }
 
 func CenterPawn(square uint8, isEndgame bool) int {

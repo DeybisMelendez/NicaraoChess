@@ -12,18 +12,16 @@ import (
 const WHITE, BLACK = 0, 1
 const OPENING, ENDGAME = 0, 1
 
-// var MaterialWeightOP = [7]int{0, 100, 300, 300, 500, 1000, 10000}
 var MaterialOpening = [7]int{0, 100, 320, 330, 500, 900, 10000}
 var MaterialEndgame = [7]int{0, 120, 320, 350, 550, 900, 10000}
 var MaterialScore = [2][7]int{MaterialOpening, MaterialEndgame} //Opening, Endgame
 
-// var PawnPhase int = 0
 var KnightPhase int = 1
 var BishopPhase int = 1
 var RookPhase int = 2
 var QueenPhase int = 4
 
-//const Delta = 200
+const Delta = 200
 
 func Evaluate(board *chess.Board, turn int) int {
 	moves := board.GenerateLegalMoves()
@@ -35,9 +33,6 @@ func Evaluate(board *chess.Board, turn int) int {
 			//Stalemate
 			return 0
 		}
-	}
-	if IsThreeFoldRepetition(board.Hash()) {
-		return 0
 	}
 	opening, endgame := 0, 0
 
@@ -75,7 +70,6 @@ func Evaluate(board *chess.Board, turn int) int {
 					opening -= IsolatedPawns(board.White.Pawns, square)
 					opening += PassedPawns(board.White.Pawns, square, true)
 
-					//endgame += CenterPawn(square, true)
 					endgame -= DoublePawns(board.White.Pawns, square)
 					endgame -= IsolatedPawns(board.White.Pawns, square)
 					endgame += PassedPawns(board.White.Pawns, square, true)
@@ -85,7 +79,6 @@ func Evaluate(board *chess.Board, turn int) int {
 					opening += IsolatedPawns(board.Black.Pawns, square)
 					opening -= PassedPawns(board.Black.Pawns, square, false)
 
-					//endgame -= CenterPawn(square, true)
 					endgame += DoublePawns(board.Black.Pawns, square)
 					endgame += IsolatedPawns(board.Black.Pawns, square)
 					endgame -= PassedPawns(board.Black.Pawns, square, false)
@@ -142,10 +135,8 @@ func Evaluate(board *chess.Board, turn int) int {
 			case chess.King:
 				if isWhite {
 					opening -= BadKing(square, allPieces, board.White.All, false)
-					endgame -= BadKing(square, allPieces, board.White.All, true)
 				} else {
 					opening += BadKing(square, allPieces, board.Black.All, false)
-					endgame += BadKing(square, allPieces, board.Black.All, true)
 				}
 			}
 		}
@@ -169,9 +160,9 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		return beta
 	}
 	// Delta pruning
-	/*if standPat < alpha-Delta {
+	if standPat < alpha-Delta {
 		return alpha
-	}*/
+	}
 	alpha = utils.Max(alpha, standPat)
 	moves := filterCaptures(board.GenerateLegalMoves(), board)
 	var score int = 0

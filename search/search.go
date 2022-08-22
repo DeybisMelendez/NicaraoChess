@@ -50,9 +50,9 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			"score", scoreType, score,
 			"nodes", Nodes,
 			"pv", FormatPV(PVTable[0]))
-		if scoreType == "mate" {
+		/*if scoreType == "mate" {
 			break
-		}
+		}*/
 		ResetGlobalVariables()
 		depth--
 		currDepth++
