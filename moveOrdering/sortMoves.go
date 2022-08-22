@@ -7,15 +7,7 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-//var FollowPV bool = false
-//var ScorePV bool = false
-
 func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, color int, ply int) int {
-	// Hash Bestmove 6000
-	// PV Move : 5000
-	// Killer Moves : 2000-3650
-	// History Move : value*100
-	// MVV-LVA : 0-650
 	score := 0
 	piece, _ := utils.GetPiece(move.From(), board)
 	historyMove := GetHistoryMove(color, piece, move.To())
