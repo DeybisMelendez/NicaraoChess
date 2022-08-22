@@ -36,15 +36,15 @@ var getRank = [64]int{
 
 func setFileRankMask(fileNumber int, rankNumber int) uint64 {
 	var mask uint64 = 0
-	for rank := uint64(0); rank < 8; rank++ {
-		for file := uint64(0); file < 8; file++ {
-			var square uint64 = rank*8 + file
+	for rank := 0; rank < 8; rank++ {
+		for file := 0; file < 8; file++ {
+			var square uint64 = uint64(rank)*8 + uint64(file)
 			if fileNumber != -1 {
-				if file == uint64(fileNumber) {
+				if file == fileNumber {
 					mask = mask | utils.SetBits(mask, square)
 				}
 			} else if rankNumber != -1 {
-				if rank == uint64(rankNumber) {
+				if rank == rankNumber {
 					mask = mask | utils.SetBits(mask, square)
 				}
 			}
