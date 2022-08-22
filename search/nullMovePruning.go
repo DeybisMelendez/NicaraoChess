@@ -13,7 +13,6 @@ const NullMoveFails = 10000
 
 func NullMove(fen string, depth int, beta int, turn int) int {
 	score := 0
-	// TODO Condicionar a que no se ejecute en finales
 	if strings.Contains(fen, " w ") {
 		fen = strings.ReplaceAll(fen, " w ", " b ")
 	} else {
