@@ -12,9 +12,6 @@ const NullMoveR = 2
 const NullMoveFails = 10000
 
 func NullMove(fen string, depth int, beta int, turn int) int {
-	if isTimeToStop() {
-		return 0
-	}
 	score := 0
 	// Condicionar a que no se ejecute en finales
 	if strings.Contains(fen, " w ") {

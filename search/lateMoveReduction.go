@@ -1,16 +1,20 @@
 package search
 
-// Late Move Reduction
 import (
+	"nicarao/moveOrdering"
+
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-const FullDepthMove = 3
+// Late Move Reduction
+
+const FullDepthMove = 6
 
 func pvReduction(depth int) int {
-	return depth - 2
+	return depth / 3
 }
 
-func isLMROk(board *chess.Board, move chess.Move) bool {
-	return !board.OurKingInCheck() && !chess.IsCapture(move, board) && move.Promote() == chess.Nothing
+func isLMROk(board *chess.Board, inCheck bool, isCapture bool, move chess.Move) bool {
+	isKillerMove := moveOrdering.KillerMoves[0][Ply] == move || moveOrdering.KillerMoves[1][Ply] == move
+	return !inCheck && !isCapture && !isKillerMove
 }

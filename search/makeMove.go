@@ -8,13 +8,9 @@ import (
 var repetitionTable = []uint64{}
 
 func IsThreeFoldRepetition(hash uint64) bool {
-	repetitionCount := 0
 	for i := 0; i < len(repetitionTable); i++ {
 		if hash == repetitionTable[i] {
-			repetitionCount++
-		}
-		if repetitionCount >= 3 {
-			return true
+			return false
 		}
 	}
 	return false
