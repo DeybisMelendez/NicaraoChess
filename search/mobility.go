@@ -8,7 +8,6 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-// white, black
 func Mobility(board *chess.Board) int {
 	white, black := 0, 0
 	fen := ""

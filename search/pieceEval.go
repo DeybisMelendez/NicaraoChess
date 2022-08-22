@@ -138,7 +138,7 @@ func GoodRook(pawns int) int {
 }
 
 func MobilityRook(square uint8, allPieces uint64, myPieces uint64) int {
-	return bits.OnesCount64(chess.CalculateRookMoveBitboard(square, allPieces)&(^myPieces)) * 4
+	return bits.OnesCount64(chess.CalculateRookMoveBitboard(square, allPieces)&(^myPieces)) * 2
 }
 
 func MobilityBishop(square uint8, allPieces uint64, myPieces uint64) int {

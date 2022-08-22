@@ -59,12 +59,10 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	}
 	moveList := board.GenerateLegalMoves()
 	moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
-	//bSearchPv := true
 	for i := 0; i < len(moveList); i++ {
 		move := moveList[i]
 		var isCapture bool = chess.IsCapture(move, board)
 		unmakeFunc := Make(board, move)
-		//Futility Pruning
 		if IsFutilityPruning(board, move, i) {
 			Unmake(unmakeFunc)
 			continue
@@ -87,21 +85,6 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		if isTimeToStop() {
 			return 0
 		}
-		/*if i >= FullDepthMove && depth > 2 && isLMROk(board, move) {
-			score = -Negamax(board, pvReduction(depth), -alpha-1, -alpha, -turn, NoNull)
-		} else {
-			score = alpha + 1
-		}
-		if score > alpha {
-			if bSearchPv {
-				score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
-			} else {
-				score = -Negamax(board, depth-1, -alpha-1, -alpha, -turn, NoNull)
-				if score > alpha {
-					score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
-				}
-			}
-		}*/
 		Unmake(unmakeFunc)
 		if score > alpha {
 			StorePV(move)
@@ -112,7 +95,6 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			if score >= beta {
 				moveOrdering.StoreKillerMove(move, board, Ply)
 				WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta, move)
-				//bSearchPv = false
 				return beta
 			}
 		}
