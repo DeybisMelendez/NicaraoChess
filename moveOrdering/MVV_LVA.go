@@ -12,7 +12,7 @@ var MVV_LVA = [7][7]int{ //[Victims][Agressors]
 	//Agressors {Nothing, Pawn, Knight, Bishop, Rook, Queen, King}
 	//Victim [Nothing, Pawn, Knight, Bishop, Rook, Queen, King]
 	{ //Nothing
-		0, 10, 20, 30, 40, 50, 0,
+		0, 50, 40, 30, 20, 10, 0,
 	},
 	{ //Pawn
 		0, 150, 140, 130, 120, 110, 100,

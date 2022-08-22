@@ -76,11 +76,16 @@ func GetPiece(square uint8, board *chess.Board) (int, bool) {
 	}
 	return piece, isWhite
 }
-func NumOfSetBits(n uint64) uint64 {
-	var count uint64
-	for n != 0 {
-		count += n & 1
-		n >>= 1
+
+func Reverse(slc [64]int) [64]int {
+	reversed := [64]int{}
+	for i := 0; i < len(slc); i++ {
+		// reverse the order
+		reversed[i] = slc[len(slc)-1-i]
 	}
-	return count
+	return reversed
+}
+
+func SetBits(mask uint64, square uint64) uint64 {
+	return ((mask) | (1 << square))
 }

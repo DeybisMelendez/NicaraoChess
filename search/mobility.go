@@ -9,7 +9,7 @@ import (
 )
 
 // white, black
-func Mobility(board *chess.Board) (int, int) {
+func Mobility(board *chess.Board) int {
 	white, black := 0, 0
 	fen := ""
 	if board.Wtomove {
@@ -32,5 +32,5 @@ func Mobility(board *chess.Board) (int, int) {
 			black++
 		}
 	}
-	return white * 5, black * 5
+	return (white * 5) - (black * 5)
 }

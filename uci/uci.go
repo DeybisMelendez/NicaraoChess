@@ -18,10 +18,13 @@ var board chess.Board
 var on bool = true
 var inputReader *bufio.Reader = bufio.NewReader(os.Stdin)
 
+func Init() {
+	search.PST = search.PstMake()
+	search.InitHasTable()
+	search.InitEvaluationMask()
+}
 func UCI() {
 	command, _ := inputReader.ReadString('\n')
-	//command := ""
-	//fmt.Scan(&command)
 	command = strings.ReplaceAll(command, "\n", "")
 	if command == "uci" {
 		uci()
@@ -54,7 +57,6 @@ func uci() {
 }
 
 func isReady() {
-	search.InitHasTable()
 	fmt.Println("readyok")
 }
 
@@ -135,11 +137,6 @@ func goCommand(command string) {
 		start := time.Now().UnixMilli()
 		if moveTime != -1 {
 			//TODO:Implementar un mejor control de tiempo
-			/*var timeTotal int64 = int64(clock) - 50
-			movetime := timeTotal/int64(movesToGo) + int64(inc)
-			if inc > 0 && timeTotal < int64(5*inc) {
-				movetime = int64(75 * inc / 100)
-			}*/
 			stopTime = start + moveTime
 		}
 		if clock != -1 {

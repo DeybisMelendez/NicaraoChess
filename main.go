@@ -11,6 +11,7 @@ var depth int = 6
 var color int = 1
 */
 func main() {
+	uci.Init()
 	uci.UCI()
 	/*start := time.Now()
 	board := chess.ParseFen(startpos)

@@ -3,19 +3,18 @@ package search
 import (
 	"fmt"
 	"nicarao/moveOrdering"
-	"strconv"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
 const Infinity = 10000
-const MateScore = 4000
+const MateScore = 8000
 
 var Ply int = 0
 var Nodes int = 0
 var StopTime int64 = -1
 var Stopped bool = false
-var scoreType string
+var scoreType string = "cp"
 var Bestmove chess.Move
 
 func Search(board *chess.Board, stopTime int64, depth int) {
@@ -39,14 +38,12 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			break
 		}
 		Bestmove = PVTable[0][0]
-		if score >= MateScore-500 {
+		if score >= MateScore-1000 {
 			score = (MateScore - score + 1) / 2
 			scoreType = "mate"
-		} else if score <= -MateScore+500 {
+		} else if score <= -MateScore+1000 {
 			score = (MateScore + score) / 2
 			scoreType = "mate"
-		} else {
-			scoreType = "cp" + strconv.Itoa(score)
 		}
 		fmt.Println("info",
 			"depth", currDepth,
