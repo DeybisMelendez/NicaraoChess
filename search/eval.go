@@ -34,6 +34,9 @@ func Evaluate(board *chess.Board, turn int) int {
 			return 0
 		}
 	}
+	if IsThreeFoldRepetition(board.Hash()) {
+		return 0
+	}
 	opening, endgame := 0, 0
 
 	whitePawnCount := int(bits.OnesCount64(board.White.Pawns))
