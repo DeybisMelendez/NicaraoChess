@@ -6,7 +6,6 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-// TODO reimplementar porque no ayuda en la búsqueda
 var historyMoves [2][7][64]int
 
 func StoreHistoryMove(move chess.Move, board *chess.Board, depth int) {
