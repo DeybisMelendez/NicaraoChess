@@ -14,15 +14,15 @@ const ExtendedCenter uint64 = 0x182424180000
 
 var PassedPawnBonus = [8]int{0, 10, 20, 40, 100, 200, 300, 400}
 
-var ranks = [8]uint64{0xff, 0xff00, 0xff0000, 0xff000000, 0xff00000000, 0xff0000000000, 0xff000000000000, 0xff00000000000000}
-var files = [8]uint64{0x8080808080808080, 0x4040404040404040, 0x2020202020202020, 0x1010101010101010,
+var Ranks = [8]uint64{0xff, 0xff00, 0xff0000, 0xff000000, 0xff00000000, 0xff0000000000, 0xff000000000000, 0xff00000000000000}
+var Files = [8]uint64{0x8080808080808080, 0x4040404040404040, 0x2020202020202020, 0x1010101010101010,
 	0x808080808080808, 0x404040404040404, 0x202020202020202, 0x101010101010101}
 
-var fileMask = [64]uint64{}
-var rankMask = [64]uint64{}
-var isolatedMask = [64]uint64{}
-var whitePassedMask = [64]uint64{}
-var blackPassedMask = [64]uint64{}
+var FileMask = [64]uint64{}
+var RankMask = [64]uint64{}
+var IsolatedMask = [64]uint64{}
+var WhitePassedMask = [64]uint64{}
+var BlackPassedMask = [64]uint64{}
 
 var getRank = [64]int{
 	7, 7, 7, 7, 7, 7, 7, 7,
@@ -57,35 +57,39 @@ func InitEvaluationMask() {
 	for rank := 0; rank < 8; rank++ {
 		for file := 0; file < 8; file++ {
 			var square int = rank*8 + file
-			fileMask[square] = fileMask[square] | setFileRankMask(file, -1)
-			rankMask[square] = rankMask[square] | setFileRankMask(-1, rank)
-			isolatedMask[square] = isolatedMask[square] | setFileRankMask(file-1, -1)
-			isolatedMask[square] = isolatedMask[square] | setFileRankMask(file+1, -1)
-			whitePassedMask[square] = whitePassedMask[square] | setFileRankMask(file-1, -1)
-			whitePassedMask[square] = whitePassedMask[square] | setFileRankMask(file, -1)
-			whitePassedMask[square] = whitePassedMask[square] | setFileRankMask(file+1, -1)
+			FileMask[square] |= setFileRankMask(file, -1)
+			RankMask[square] |= setFileRankMask(-1, rank)
+			IsolatedMask[square] |= setFileRankMask(file-1, -1)
+			IsolatedMask[square] |= setFileRankMask(file+1, -1)
+		}
+	}
+	for rank := 0; rank < 8; rank++ {
+		for file := 0; file < 8; file++ {
+			var square int = rank*8 + file
+			WhitePassedMask[square] |= setFileRankMask(file-1, -1)
+			WhitePassedMask[square] |= setFileRankMask(file, -1)
+			WhitePassedMask[square] |= setFileRankMask(file+1, -1)
 			for i := 0; i < (8 - rank); i++ {
-				whitePassedMask[square] = whitePassedMask[square] & rankMask[(7-i)*8+file]
+				WhitePassedMask[square] &= ^RankMask[(7-i)*8+file]
 			}
-
-			blackPassedMask[square] = blackPassedMask[square] | setFileRankMask(file-1, -1)
-			blackPassedMask[square] = blackPassedMask[square] | setFileRankMask(file, -1)
-			blackPassedMask[square] = blackPassedMask[square] | setFileRankMask(file+1, -1)
+			BlackPassedMask[square] |= setFileRankMask(file-1, -1)
+			BlackPassedMask[square] |= setFileRankMask(file, -1)
+			BlackPassedMask[square] |= setFileRankMask(file+1, -1)
 			for i := 0; i < rank+1; i++ {
-				blackPassedMask[square] = blackPassedMask[square] & rankMask[(7-i)*8+file]
+				BlackPassedMask[square] &= ^RankMask[i*8+file]
 			}
 		}
 	}
 }
 
 func DoublePawns(pawns uint64, square uint8) int {
-	if bits.OnesCount64(pawns&uint64(fileMask[square])) > 1 {
+	if bits.OnesCount64(pawns&uint64(FileMask[square])) > 1 {
 		return 10
 	}
 	return 0
 }
 func IsolatedPawns(pawns uint64, square uint8) int {
-	if pawns&isolatedMask[square] == 0 {
+	if pawns&IsolatedMask[square] == 0 {
 		return 10
 	}
 	return 0
@@ -93,13 +97,13 @@ func IsolatedPawns(pawns uint64, square uint8) int {
 
 func PassedPawns(pawns uint64, square uint8, isWhite bool) int {
 	if isWhite {
-		if pawns&whitePassedMask[square] == 0 {
+		if pawns&WhitePassedMask[square] == 0 {
 			return PassedPawnBonus[getRank[63-square]]
 		} else {
 			return 0
 		}
 	}
-	if pawns&blackPassedMask[square] == 0 {
+	if pawns&BlackPassedMask[square] == 0 {
 		return PassedPawnBonus[getRank[square]]
 	}
 	return 0

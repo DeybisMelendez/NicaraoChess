@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"fmt"
+
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
@@ -88,4 +90,18 @@ func Reverse(slc [64]int) [64]int {
 
 func SetBits(mask uint64, square uint64) uint64 {
 	return ((mask) | (1 << square))
+}
+
+func PrintBits(bits uint64) {
+	for y := uint64(0); y < 8; y++ {
+		line := ""
+		for x := uint64(0); x < 8; x++ {
+			if bits&(1<<((7-y)*8+x)) > 0 {
+				line += "1"
+			} else {
+				line += "0"
+			}
+		}
+		fmt.Println(line)
+	}
 }

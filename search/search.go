@@ -33,6 +33,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 		if depth == 0 {
 			break
 		}
+		moveOrdering.FollowPV = true
 		score = Negamax(board, currDepth, alpha, beta, turn, DoNull)
 		if isTimeToStop() {
 			break

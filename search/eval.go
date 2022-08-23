@@ -69,22 +69,22 @@ func Evaluate(board *chess.Board, turn int) int {
 			case chess.Pawn:
 				if isWhite {
 					opening += CenterPawn(square, false)
-					/*opening -= DoublePawns(board.White.Pawns, square)
+					opening -= DoublePawns(board.White.Pawns, square)
 					opening -= IsolatedPawns(board.White.Pawns, square)
 					opening += PassedPawns(board.White.Pawns, square, true)
 
 					endgame -= DoublePawns(board.White.Pawns, square)
 					endgame -= IsolatedPawns(board.White.Pawns, square)
-					endgame += PassedPawns(board.White.Pawns, square, true)*/
+					endgame += PassedPawns(board.White.Pawns, square, true)
 				} else {
 					opening -= CenterPawn(square, false)
-					/*opening += DoublePawns(board.Black.Pawns, square)
+					opening += DoublePawns(board.Black.Pawns, square)
 					opening += IsolatedPawns(board.Black.Pawns, square)
 					opening -= PassedPawns(board.Black.Pawns, square, false)
 
 					endgame += DoublePawns(board.Black.Pawns, square)
 					endgame += IsolatedPawns(board.Black.Pawns, square)
-					endgame -= PassedPawns(board.Black.Pawns, square, false)*/
+					endgame -= PassedPawns(board.Black.Pawns, square, false)
 				}
 			case chess.Knight:
 				phase -= KnightPhase

@@ -7,14 +7,20 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
+var FollowPV bool
+
 func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, color int, ply int) int {
 	score := 0
 	piece, _ := utils.GetPiece(move.From(), board)
 	historyMove := GetHistoryMove(color, piece, move.To())
 	if move == bestmove {
 		score = 6000000
-	} else if move == pvMove {
-		score = 5000000
+	} else if ply > 0 && FollowPV {
+		FollowPV = false
+		if move == pvMove {
+			FollowPV = true
+			score = 5000000
+		}
 	} else if KillerMoves[0][ply] == move {
 		score = 4000000
 	} else if KillerMoves[1][ply] == move {

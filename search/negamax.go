@@ -90,12 +90,12 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
 			if i >= FullDepthMove && isLMROk(board, inCheck, isCapture, move) && !isPVNode {
-				score = -Negamax(board, pvReduction(depth), -alpha-1, -alpha, -turn, NoNull)
+				score = -Negamax(board, pvReduction(depth), -alpha-1, -alpha, -turn, DoNull)
 			} else {
 				score = alpha + 1
 			}
 			if score > alpha {
-				score = -Negamax(board, depth-1, -alpha-1, -alpha, -turn, NoNull)
+				score = -Negamax(board, depth-1, -alpha-1, -alpha, -turn, DoNull)
 				if score > alpha && score < beta {
 					score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 				}

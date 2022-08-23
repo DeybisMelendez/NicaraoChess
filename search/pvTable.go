@@ -4,7 +4,6 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-// posiblemente tenga que completar el pvmove si no funciona correctamente, falta followPV
 var PVLength [64]int
 var PVTable [64][64]chess.Move
 
