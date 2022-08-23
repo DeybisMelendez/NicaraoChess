@@ -23,8 +23,12 @@ var QueenPhase int = 4
 
 const Delta = 200
 
+var TotalPhase int = KnightPhase*4 +
+	BishopPhase*4 + RookPhase*4 + QueenPhase*2 //+PawnPhase*16
+var phase int = TotalPhase
+
 func Evaluate(board *chess.Board, turn int) int {
-	moves := board.GenerateLegalMoves()
+	/*moves := board.GenerateLegalMoves()
 	if len(moves) == 0 {
 		if board.OurKingInCheck() {
 			//Checkmate
@@ -36,17 +40,13 @@ func Evaluate(board *chess.Board, turn int) int {
 	}
 	if IsThreeFoldRepetition(board.Hash()) {
 		return 0
-	}
+	}*/
 	opening, endgame := 0, 0
 
 	whitePawnCount := int(bits.OnesCount64(board.White.Pawns))
 	blackPawnCount := int(bits.OnesCount64(board.White.Pawns))
 	allPieces := board.White.All | board.Black.All
 	allPawnCount := whitePawnCount + blackPawnCount
-
-	var TotalPhase int = KnightPhase*4 +
-		BishopPhase*4 + RookPhase*4 + QueenPhase*2 //+PawnPhase*16
-	var phase int = TotalPhase
 
 	for square := uint8(0); square < 64; square++ {
 		piece, isWhite := utils.GetPiece(square, board)
@@ -55,90 +55,84 @@ func Evaluate(board *chess.Board, turn int) int {
 			if isWhite {
 				opening += MaterialScore[OPENING][piece]
 				endgame += MaterialScore[ENDGAME][piece]
-
 				opening += PST[WHITE][OPENING][piece][square]
 				endgame += PST[WHITE][ENDGAME][piece][square]
-			} else {
-				opening -= MaterialScore[OPENING][piece]
-				endgame -= MaterialScore[ENDGAME][piece]
-				opening -= PST[BLACK][OPENING][piece][square]
-				endgame -= PST[BLACK][ENDGAME][piece][square]
-			}
-			//Piece Evaluation
-			switch piece {
-			case chess.Pawn:
-				if isWhite {
+				switch piece {
+				case chess.Pawn:
+					val := PassedPawns(board.White.Pawns, square, true)
+					val -= DoublePawns(board.White.Pawns, square)
+					val -= IsolatedPawns(board.White.Pawns, square)
 					opening += CenterPawn(square, false)
-					opening -= DoublePawns(board.White.Pawns, square)
-					opening -= IsolatedPawns(board.White.Pawns, square)
-					opening += PassedPawns(board.White.Pawns, square, true)
-
-					endgame -= DoublePawns(board.White.Pawns, square)
-					endgame -= IsolatedPawns(board.White.Pawns, square)
-					endgame += PassedPawns(board.White.Pawns, square, true)
-				} else {
-					opening -= CenterPawn(square, false)
-					opening += DoublePawns(board.Black.Pawns, square)
-					opening += IsolatedPawns(board.Black.Pawns, square)
-					opening -= PassedPawns(board.Black.Pawns, square, false)
-
-					endgame += DoublePawns(board.Black.Pawns, square)
-					endgame += IsolatedPawns(board.Black.Pawns, square)
-					endgame -= PassedPawns(board.Black.Pawns, square, false)
-				}
-			case chess.Knight:
-				phase -= KnightPhase
-				val := BadKnight(allPawnCount)
-				if isWhite {
 					opening += val
 					endgame += val
-				} else {
-					opening -= val
-					endgame -= val
-				}
-			case chess.Bishop:
-				phase -= BishopPhase
-				if isWhite {
+				case chess.Knight:
+					phase -= KnightPhase
+					val := BadKnight(allPawnCount)
+					opening += val
+					endgame += val
+				case chess.Bishop:
+					phase -= BishopPhase
 					val := BishopPair(board.White.Bishops)
 					val += MobilityBishop(square, allPieces, board.White.All)
 					val -= BadBishop(square, board.White.Pawns)
 					opening += val
 					endgame += val
-				} else {
+
+				case chess.Rook:
+					phase -= RookPhase
+
+					val := GoodRook(allPawnCount)
+					val += MobilityRook(square, allPieces, board.White.All)
+					opening += val
+					endgame += val
+
+				case chess.Queen:
+					phase -= QueenPhase
+					val := BadQueen(board, true, square)
+					opening -= val
+					endgame -= val
+
+				case chess.King:
+					opening -= BadKing(square, allPieces, board.White.All, false)
+				}
+			} else {
+				opening -= MaterialScore[OPENING][piece]
+				endgame -= MaterialScore[ENDGAME][piece]
+				opening -= PST[BLACK][OPENING][piece][square]
+				endgame -= PST[BLACK][ENDGAME][piece][square]
+				//Piece Evaluation
+				switch piece {
+				case chess.Pawn:
+					val := PassedPawns(board.Black.Pawns, square, false)
+					val -= IsolatedPawns(board.Black.Pawns, square)
+					val -= DoublePawns(board.Black.Pawns, square)
+					opening -= CenterPawn(square, false)
+					opening -= val
+					endgame -= val
+				case chess.Knight:
+					phase -= KnightPhase
+					val := BadKnight(allPawnCount)
+					opening -= val
+					endgame -= val
+				case chess.Bishop:
+					phase -= BishopPhase
 					val := BishopPair(board.Black.Bishops)
 					val += MobilityBishop(square, allPieces, board.Black.All)
 					val -= BadBishop(square, board.Black.Pawns)
 					opening -= val
 					endgame -= val
-				}
-			case chess.Rook:
-				phase -= RookPhase
-				if isWhite {
-					val := GoodRook(allPawnCount)
-					val += MobilityRook(square, allPieces, board.White.All)
-					opening += val
-					endgame += val
-				} else {
+				case chess.Rook:
+					phase -= RookPhase
 					val := GoodRook(allPawnCount)
 					val += MobilityRook(square, allPieces, board.Black.All)
 					opening -= val
 					endgame -= val
-				}
-			case chess.Queen:
-				phase -= QueenPhase
-				if isWhite {
-					val := BadQueen(board, true, square)
-					opening -= val
-					endgame -= val
-				} else {
+				case chess.Queen:
+					phase -= QueenPhase
 					val := BadQueen(board, false, square)
 					opening += val
 					endgame += val
-				}
-			case chess.King:
-				if isWhite {
-					opening -= BadKing(square, allPieces, board.White.All, false)
-				} else {
+				case chess.King:
 					opening += BadKing(square, allPieces, board.Black.All, false)
 				}
 			}
@@ -146,9 +140,9 @@ func Evaluate(board *chess.Board, turn int) int {
 	}
 	phase = ((phase * 256) + (TotalPhase / 2)) / TotalPhase
 	score := ((opening * (256 - phase)) + (opening * phase)) / 256
-	if isEndgame(board) {
+	/*if isEndgame(board) {
 		return endgame * turn // Endgame
-	}
+	}*/
 	return score * turn
 }
 
