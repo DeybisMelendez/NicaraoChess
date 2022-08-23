@@ -3,6 +3,7 @@ package search
 import (
 	"math"
 	"nicarao/moveOrdering"
+	"nicarao/utils"
 	"time"
 
 	chess "github.com/dylhunn/dragontoothmg"
@@ -45,14 +46,17 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	}
 	if !inCheck && !isPVNode {
 		staticEval := Evaluate(board, turn)
+		//evaluation pruning
 		if depth < 3 && int(math.Abs(float64(beta-1))) > -MateScore+100 {
 			evalMargin := 100 * depth
 			if staticEval-evalMargin >= beta {
 				return staticEval - evalMargin
 			}
 		}
-		if nullMove && !isEndgame(board) {
-			if Ply > 0 && depth > NullMoveR && staticEval > beta && depth < 4 {
+		if nullMove {
+			//https://www.chessprogramming.org/Null_Move_Pruning#Schemes
+			if Ply > 0 && depth > NullMoveR && AllowNullMove(board) && !isEndgame(board) {
+				//if Ply > 0 && depth > NullMoveR && staticEval > beta && depth < 4 {
 				nullScore := NullMove(board.ToFen(), depth, beta, turn)
 				if nullScore != NullMoveFails {
 					return beta
@@ -65,15 +69,11 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			if score < beta && depth == 1 {
 				var newScore int = Quiesce(board, alpha, beta, turn)
 				if newScore < beta {
-					if newScore > score {
-						return newScore
-					} else {
-						return score
-					}
+					return utils.Max(newScore, score)
 				}
 			}
 		}
-		CheckFutilityPruning(staticEval, depth, alpha)
+		//CheckFutilityPruning(staticEval, depth, alpha)
 	}
 	moveList := board.GenerateLegalMoves()
 	moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
@@ -82,20 +82,20 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		move := moveList[i]
 		var isCapture bool = chess.IsCapture(move, board)
 		unmakeFunc := Make(board, move)
-		if IsFutilityPruning(board, i, inCheck, isCapture) && !isPVNode {
+		/*if IsFutilityPruning(board, i, inCheck, isCapture) && !isPVNode {
 			Unmake(unmakeFunc)
 			continue
-		}
+		}*/
 		if bSearchPV {
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
 			if i >= FullDepthMove && isLMROk(board, inCheck, isCapture, move) && !isPVNode {
-				score = -Negamax(board, pvReduction(depth), -alpha-1, -alpha, -turn, DoNull)
+				score = -Negamax(board, pvReduction(depth), -alpha-1, -alpha, -turn, NoNull)
 			} else {
 				score = alpha + 1
 			}
 			if score > alpha {
-				score = -Negamax(board, depth-1, -alpha-1, -alpha, -turn, DoNull)
+				score = -Negamax(board, depth-1, -alpha-1, -alpha, -turn, NoNull)
 				if score > alpha && score < beta {
 					score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 				}

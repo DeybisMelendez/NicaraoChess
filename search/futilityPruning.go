@@ -10,11 +10,11 @@ var FutilityMargin = [4]int{0, 100, 300, 500}
 var FutilityPruning bool
 
 func CheckFutilityPruning(staticEval int, depth int, alpha int) {
-	FutilityPruning = false
-	if depth < 4 {
-		if int(math.Abs(float64(alpha))) < MateScore && staticEval+FutilityMargin[depth] <= alpha {
-			FutilityPruning = true
-		}
+	//FutilityPruning = false
+	if depth < 4 &&
+		int(math.Abs(float64(alpha))) < MateScore &&
+		staticEval+FutilityMargin[depth] <= alpha {
+		FutilityPruning = true
 	}
 }
 
