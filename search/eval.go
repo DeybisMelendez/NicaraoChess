@@ -28,19 +28,6 @@ var TotalPhase int = KnightPhase*4 +
 var phase int = TotalPhase
 
 func Evaluate(board *chess.Board, turn int) int {
-	/*moves := board.GenerateLegalMoves()
-	if len(moves) == 0 {
-		if board.OurKingInCheck() {
-			//Checkmate
-			return -MateScore + Ply
-		} else {
-			//Stalemate
-			return 0
-		}
-	}
-	if IsThreeFoldRepetition(board.Hash()) {
-		return 0
-	}*/
 	opening, endgame := 0, 0
 
 	whitePawnCount := int(bits.OnesCount64(board.White.Pawns))
@@ -55,8 +42,8 @@ func Evaluate(board *chess.Board, turn int) int {
 			if isWhite {
 				opening += MaterialScore[OPENING][piece]
 				endgame += MaterialScore[ENDGAME][piece]
-				opening += PST[WHITE][OPENING][piece][square]
-				endgame += PST[WHITE][ENDGAME][piece][square]
+				opening += PST[OPENING][piece][ReversedBoard[square]]
+				endgame += PST[ENDGAME][piece][ReversedBoard[square]]
 				switch piece {
 				case chess.Pawn:
 					val := PassedPawns(board.White.Pawns, square, true)
@@ -97,8 +84,8 @@ func Evaluate(board *chess.Board, turn int) int {
 			} else {
 				opening -= MaterialScore[OPENING][piece]
 				endgame -= MaterialScore[ENDGAME][piece]
-				opening -= PST[BLACK][OPENING][piece][square]
-				endgame -= PST[BLACK][ENDGAME][piece][square]
+				opening -= PST[OPENING][piece][square]
+				endgame -= PST[ENDGAME][piece][square]
 				//Piece Evaluation
 				switch piece {
 				case chess.Pawn:

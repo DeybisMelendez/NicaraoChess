@@ -4,7 +4,7 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-const FullDepthMove = 6
+const FullDepthMove = 3
 
 func pvReduction(depth int) int {
 	return depth / 3

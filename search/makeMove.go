@@ -1,19 +1,22 @@
 package search
 
 import (
+	"fmt"
+
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
 // https://www.youtube.com/watch?v=QhFtquEeffA
-var repetitionTable = []uint64{}
+var RepetitionTable = [150]uint64{}
 
 func IsThreeFoldRepetition(hash uint64) bool {
-	count := 0
-	for i := 0; i < len(repetitionTable); i++ {
-		if hash == repetitionTable[i] {
+	var count int = 0
+	for i := 0; i < Ply; i++ {
+		if hash == RepetitionTable[i] {
 			count++
 		}
-		if count > 2 {
+		if count == 2 {
+			fmt.Println("repetition found")
 			return true
 		}
 	}
@@ -23,16 +26,13 @@ func IsThreeFoldRepetition(hash uint64) bool {
 func Make(board *chess.Board, move chess.Move) func() {
 	Ply++
 	Nodes++
+	RepetitionTable[Ply] = board.Hash()
 	f := board.Apply(move)
-	repetitionTable = append(repetitionTable, board.Hash())
+
 	return f
 }
 
 func Unmake(f func()) {
 	Ply--
-	// pop last element
-	if len(repetitionTable) > 0 {
-		repetitionTable = repetitionTable[:len(repetitionTable)-1]
-	}
 	f()
 }

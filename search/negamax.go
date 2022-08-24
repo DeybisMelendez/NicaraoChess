@@ -12,18 +12,17 @@ import (
 func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullMove bool) int {
 	PVLength[Ply] = Ply
 	var hashFlag int = HashFlagAlpha
-	FutilityPruning = false
 	var score int = 0
 	var bestmove chess.Move
 	var isPVNode bool = beta-alpha > 1
+	if IsThreeFoldRepetition(board.Hash()) {
+		return 0
+	}
 	var hashScore = ReadHashEntry(board.Hash(), alpha, beta, depth, &bestmove)
 	if hashScore != NoHashEntry && Ply > 0 && !isPVNode {
 		return hashScore
 	}
 	if isTimeToStop() {
-		return 0
-	}
-	if IsThreeFoldRepetition(board.Hash()) {
 		return 0
 	}
 	if depth == 0 {
@@ -45,7 +44,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		depth++
 	}
 	if !inCheck && !isPVNode {
-		staticEval := Evaluate(board, turn)
+		var staticEval int = Evaluate(board, turn)
 		//evaluation pruning
 		if depth < 3 && int(math.Abs(float64(beta-1))) > -MateScore+100 {
 			evalMargin := 100 * depth
@@ -55,8 +54,8 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		}
 		if nullMove {
 			//https://www.chessprogramming.org/Null_Move_Pruning#Schemes
-			//if Ply > 0 && depth > NullMoveR && AllowNullMove(board) && !isEndgame(board) {
-			if Ply > 0 && depth > NullMoveR && staticEval > beta && depth < 4 {
+			if Ply > 0 && depth > NullMoveR && AllowNullMove(board) && !isEndgame(board) {
+				//if Ply > 0 && depth > NullMoveR && staticEval > beta && !isEndgame(board) {
 				nullScore := NullMove(board.ToFen(), depth, beta, turn)
 				if nullScore != NullMoveFails {
 					return beta
@@ -74,23 +73,25 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 				}
 			}
 		}
-		//CheckFutilityPruning(staticEval, depth, alpha)
 	}
 	moveList := board.GenerateLegalMoves()
 	moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
-	//bSearchPV := true
 	for i := 0; i < len(moveList); i++ {
 		move := moveList[i]
 		var isCapture bool = chess.IsCapture(move, board)
 		unmakeFunc := Make(board, move)
-		/*if IsFutilityPruning(board, i, inCheck, isCapture) && !isPVNode {
-			Unmake(unmakeFunc)
-			continue
+		/*if depth == 1 && !isPVNode {
+			var staticEval int = Evaluate(board, turn)
+			var isPromotion bool = move.Promote() != chess.Nothing
+			if IsFutilityPruning(staticEval, alpha, board, inCheck, isCapture, isPromotion) {
+				Unmake(unmakeFunc)
+				continue
+			}
 		}*/
-		if i == 0 {
+		if i < FullDepthMove {
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
-			if i >= FullDepthMove && isLMROk(board, inCheck, isCapture, move) && !isPVNode {
+			if isLMROk(board, inCheck, isCapture, move) && !isPVNode {
 				score = -Negamax(board, pvReduction(depth), -alpha-1, -alpha, -turn, NoNull)
 			} else {
 				score = alpha + 1
@@ -106,14 +107,12 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			return 0
 		}
 		Unmake(unmakeFunc)
-
 		if score > alpha {
 			StorePV(move)
 			moveOrdering.StoreHistoryMove(move, board, depth)
 			bestmove = move
 			hashFlag = HashFlagExact
 			alpha = score
-			//bSearchPV = false
 			if score >= beta {
 				moveOrdering.StoreKillerMove(move, board, Ply)
 				WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta, move)

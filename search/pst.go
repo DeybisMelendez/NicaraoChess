@@ -1,10 +1,19 @@
 package search
 
-import "nicarao/utils"
+var PST = [2][7][64]int{} //[phase][piece][square]
 
-var PST = [2][2][7][64]int{} //[color][phase][piece][square]
+var ReversedBoard = [64]int{
+	56, 57, 58, 59, 60, 61, 62, 63,
+	48, 49, 50, 51, 52, 53, 54, 55,
+	40, 41, 42, 43, 44, 45, 46, 47,
+	32, 33, 34, 35, 36, 37, 38, 39,
+	24, 25, 26, 27, 28, 29, 30, 31,
+	16, 17, 18, 19, 20, 21, 22, 23,
+	8, 9, 10, 11, 12, 13, 14, 15,
+	0, 1, 2, 3, 4, 5, 6, 7,
+}
 
-func PstMake() [2][2][7][64]int {
+func PstMake() [2][7][64]int {
 	// El tablero se miraría como si llevara las piezas negras
 	PawnMG := [64]int{
 		0, 0, 0, 0, 0, 0, 0, 0,
@@ -97,11 +106,11 @@ func PstMake() [2][2][7][64]int {
 		-50, -30, -30, -30, -30, -30, -30, -50,
 	}
 	nothing := [64]int{}
-	blackMiddle := [7][64]int{nothing, PawnMG, KnightMG, BishopMG, RookMG, QueenMG, KingMG}
+	opening := [7][64]int{nothing, PawnMG, KnightMG, BishopMG, RookMG, QueenMG, KingMG}
 
-	blackEnd := [7][64]int{nothing, PawnEG, KnightMG, BishopMG, RookEG, QueenMG, KingEG}
+	endgame := [7][64]int{nothing, PawnEG, KnightMG, BishopMG, RookEG, QueenMG, KingEG}
 
-	whiteMiddle := [7][64]int{nothing, utils.Reverse(PawnMG), utils.Reverse(KnightMG), utils.Reverse(BishopMG),
+	/*whiteMiddle := [7][64]int{nothing, utils.Reverse(PawnMG), utils.Reverse(KnightMG), utils.Reverse(BishopMG),
 		utils.Reverse(RookMG), utils.Reverse(QueenMG), utils.Reverse(KingMG)}
 
 	whiteEnd := [7][64]int{nothing, utils.Reverse(PawnEG), utils.Reverse(KnightMG), utils.Reverse(BishopMG),
@@ -109,7 +118,7 @@ func PstMake() [2][2][7][64]int {
 
 	white := [2][7][64]int{whiteMiddle, whiteEnd}
 	black := [2][7][64]int{blackMiddle, blackEnd}
-
-	pst := [2][2][7][64]int{white, black}
+	*/
+	pst := [2][7][64]int{opening, endgame}
 	return pst
 }

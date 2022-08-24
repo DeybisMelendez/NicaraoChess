@@ -30,11 +30,11 @@ func NullMove(fen string, depth int, beta int, turn int) int {
 
 func AllowNullMove(board *chess.Board) bool {
 	if board.Wtomove {
-		if board.White.Knights&board.White.Bishops&board.White.Rooks&board.White.Queens > 0 {
+		if (board.White.Knights&board.White.Bishops)&(board.White.Rooks&board.White.Queens) > 0 {
 			return true
 		}
 	} else {
-		if board.Black.Knights&board.Black.Bishops&board.Black.Rooks&board.Black.Queens > 0 {
+		if (board.Black.Knights&board.Black.Bishops)&(board.Black.Rooks&board.Black.Queens) > 0 {
 			return true
 		}
 	}

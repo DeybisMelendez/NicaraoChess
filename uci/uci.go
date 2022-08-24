@@ -82,6 +82,7 @@ func position(command string) {
 					fmt.Println(err)
 				}
 				_ = board.Apply(move)
+				//search.RepetitionTable = append(search.RepetitionTable, board.Hash())
 			}
 		}
 	}
