@@ -83,7 +83,7 @@ func InitEvaluationMask() {
 }
 
 func DoublePawns(pawns uint64, square uint8) int {
-	if bits.OnesCount64(pawns&uint64(FileMask[square])) > 1 {
+	if bits.OnesCount64(pawns&FileMask[square]) > 1 {
 		return 10
 	}
 	return 0
@@ -151,13 +151,13 @@ func MobilityBishop(square uint8, allPieces uint64, myPieces uint64) int {
 
 func BadQueen(board *chess.Board, byBlack bool, square uint8) int {
 	if board.UnderDirectAttack(byBlack, square) {
-		return 20
+		return 40
 	}
 	return 0
 }
 
 func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool) int {
-	return MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)*2
+	return MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)
 }
 
 func CenterPawn(square uint8, isEndgame bool) int {

@@ -12,8 +12,8 @@ import (
 const WHITE, BLACK = 0, 1
 const OPENING, ENDGAME = 0, 1
 
-var MaterialOpening = [7]int{0, 100, 320, 330, 500, 900, 10000}
-var MaterialEndgame = [7]int{0, 120, 320, 350, 550, 900, 10000}
+var MaterialOpening = [7]int{0, 90, 320, 330, 500, 900, 10000}
+var MaterialEndgame = [7]int{0, 100, 320, 350, 550, 900, 10000}
 var MaterialScore = [2][7]int{MaterialOpening, MaterialEndgame} //Opening, Endgame
 
 var KnightPhase int = 1
@@ -68,8 +68,8 @@ func Evaluate(board *chess.Board, turn int) int {
 				case chess.Knight:
 					phase -= KnightPhase
 					val := BadKnight(allPawnCount)
-					opening += val
-					endgame += val
+					opening -= val
+					endgame -= val
 				case chess.Bishop:
 					phase -= BishopPhase
 					val := BishopPair(board.White.Bishops)
@@ -80,7 +80,6 @@ func Evaluate(board *chess.Board, turn int) int {
 
 				case chess.Rook:
 					phase -= RookPhase
-
 					val := GoodRook(allPawnCount)
 					val += MobilityRook(square, allPieces, board.White.All)
 					opening += val
@@ -112,8 +111,8 @@ func Evaluate(board *chess.Board, turn int) int {
 				case chess.Knight:
 					phase -= KnightPhase
 					val := BadKnight(allPawnCount)
-					opening -= val
-					endgame -= val
+					opening += val
+					endgame += val
 				case chess.Bishop:
 					phase -= BishopPhase
 					val := BishopPair(board.Black.Bishops)
@@ -155,9 +154,9 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		return beta
 	}
 	// Delta pruning
-	if standPat < alpha-Delta {
+	/*if standPat < alpha-Delta {
 		return alpha
-	}
+	}*/
 	alpha = utils.Max(alpha, standPat)
 	moves := filterCaptures(board.GenerateLegalMoves(), board)
 	var score int = 0

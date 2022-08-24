@@ -13,7 +13,7 @@ func IsThreeFoldRepetition(hash uint64) bool {
 		if hash == repetitionTable[i] {
 			count++
 		}
-		if count >= 3 {
+		if count > 2 {
 			return true
 		}
 	}
