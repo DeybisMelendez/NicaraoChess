@@ -21,4 +21,4 @@ b1B3Q1/5K2/5NP1/n7/2p2k1P/3pN2R/1B1P4/4qn2 w - - 0 1
 
 # Mate en 4
 
-8/1P5B/8/2P5/8/6K1/NkP3p1/RN6 w - - 0 1                     --Mate en 5 encuentra
+8/1P5B/8/2P5/8/6K1/NkP3p1/RN6 w - - 0 1

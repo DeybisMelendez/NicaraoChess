@@ -62,6 +62,7 @@ func isReady() {
 
 func uciNewGame() {
 	//search.SetHashTable(search.Mb)
+	search.ClearSearch()
 	board = chess.ParseFen(startpos)
 }
 
@@ -70,6 +71,7 @@ func position(command string) {
 	if commands[1] == "startpos" {
 		uciNewGame()
 	} else if commands[1] == "fen" {
+		search.ClearSearch()
 		board = chess.ParseFen(strings.Split(command, "position fen ")[1])
 	}
 	if strings.Contains(command, "moves ") {
@@ -82,7 +84,6 @@ func position(command string) {
 					fmt.Println(err)
 				}
 				_ = board.Apply(move)
-				//search.RepetitionTable = append(search.RepetitionTable, board.Hash())
 			}
 		}
 	}

@@ -14,12 +14,11 @@ var Ply int = 0
 var Nodes int = 0
 var StopTime int64 = -1
 var Stopped bool = false
-var scoreType string = "cp"
 var Bestmove chess.Move
 
 func Search(board *chess.Board, stopTime int64, depth int) {
 	score := 0
-	clearSearch()
+	scoreType := "cp"
 	alpha := -Infinity
 	beta := Infinity
 	StopTime = stopTime
@@ -60,9 +59,10 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	}
 	toPrint := "bestmove " + Bestmove.String()
 	fmt.Println(toPrint)
+	ClearSearch()
 }
 
-func clearSearch() {
+func ClearSearch() {
 	InitHasTable()
 	ResetPVTable()
 	ResetGlobalVariables()

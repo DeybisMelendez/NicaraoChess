@@ -28,8 +28,8 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if depth == 0 {
 		return Quiesce(board, alpha, beta, turn) //Evaluate(board,turn) //
 	}
-	// Mate Distance pruning
-	/*if alpha < -MateScore {
+	/*// Mate Distance pruning
+	if alpha < -MateScore {
 		alpha = -MateScore
 	}
 	if beta > MateScore-1 {
@@ -46,7 +46,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if !inCheck && !isPVNode {
 		var staticEval int = Evaluate(board, turn)
 		//evaluation pruning
-		if depth < 3 && int(math.Abs(float64(beta-1))) > -MateScore+100 {
+		if depth < 3 && int(math.Abs(float64(beta-1))) > -MateScore+500 {
 			evalMargin := 100 * depth
 			if staticEval-evalMargin >= beta {
 				return staticEval - evalMargin
@@ -97,7 +97,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			}
 			if score > alpha {
 				score = -Negamax(board, depth-1, -alpha-1, -alpha, -turn, NoNull)
-				if score > alpha && score < beta {
+				if score > alpha { //&& score < beta {
 					score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 				}
 			}
@@ -151,4 +151,6 @@ func ResetGlobalVariables() {
 	Ply = 0
 	Nodes = 0
 	Stopped = false
+	var newRep = [150]uint64{}
+	RepetitionTable = newRep
 }

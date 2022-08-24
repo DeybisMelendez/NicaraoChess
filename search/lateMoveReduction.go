@@ -1,6 +1,8 @@
 package search
 
 import (
+	"nicarao/moveOrdering"
+
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
@@ -11,6 +13,6 @@ func pvReduction(depth int) int {
 }
 
 func isLMROk(board *chess.Board, inCheck bool, isCapture bool, move chess.Move) bool {
-	//isKillerMove := moveOrdering.KillerMoves[0][Ply] == move || moveOrdering.KillerMoves[1][Ply] == move
-	return !inCheck && !isCapture && move.Promote() == chess.Nothing // && !isKillerMove
+	isKillerMove := moveOrdering.KillerMoves[0][Ply] == move || moveOrdering.KillerMoves[1][Ply] == move
+	return !inCheck && !isCapture && move.Promote() == chess.Nothing && !isKillerMove
 }

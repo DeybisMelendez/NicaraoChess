@@ -13,7 +13,7 @@ func IsThreeFoldRepetition(hash uint64) bool {
 		if hash == RepetitionTable[i] {
 			count++
 		}
-		if count == 2 {
+		if count > 1 {
 			return true
 		}
 	}
@@ -21,9 +21,9 @@ func IsThreeFoldRepetition(hash uint64) bool {
 }
 
 func Make(board *chess.Board, move chess.Move) func() {
+	RepetitionTable[Ply] = board.Hash()
 	Ply++
 	Nodes++
-	RepetitionTable[Ply] = board.Hash()
 	f := board.Apply(move)
 
 	return f
