@@ -39,10 +39,10 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			break
 		}
 		Bestmove = PVTable[0][0]
-		if score >= MateScore-1000 {
+		if score >= MateScore-500 {
 			score = (MateScore - score + 1) / 2
 			scoreType = "mate"
-		} else if score <= -MateScore+1000 {
+		} else if score <= -MateScore+500 {
 			score = (MateScore + score) / 2
 			scoreType = "mate"
 		}

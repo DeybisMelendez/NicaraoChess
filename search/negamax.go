@@ -79,15 +79,14 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	for i := 0; i < len(moveList); i++ {
 		move := moveList[i]
 		var isCapture bool = chess.IsCapture(move, board)
-		unmakeFunc := Make(board, move)
-		/*if depth == 1 && !isPVNode {
+		if depth == 1 && !isPVNode {
 			var staticEval int = Evaluate(board, turn)
 			var isPromotion bool = move.Promote() != chess.Nothing
 			if IsFutilityPruning(staticEval, alpha, board, inCheck, isCapture, isPromotion) {
-				Unmake(unmakeFunc)
 				continue
 			}
-		}*/
+		}
+		unmakeFunc := Make(board, move)
 		if i < FullDepthMove {
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
@@ -150,6 +149,6 @@ func isTimeToStop() bool {
 
 func ResetGlobalVariables() {
 	Ply = 0
-	Nodes = 0
+	//Nodes = 0
 	Stopped = false
 }

@@ -1,8 +1,6 @@
 package search
 
 import (
-	"fmt"
-
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
@@ -16,7 +14,6 @@ func IsThreeFoldRepetition(hash uint64) bool {
 			count++
 		}
 		if count == 2 {
-			fmt.Println("repetition found")
 			return true
 		}
 	}
