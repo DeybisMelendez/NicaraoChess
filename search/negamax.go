@@ -149,6 +149,6 @@ func isTimeToStop() bool {
 
 func ResetGlobalVariables() {
 	Ply = 0
-	//Nodes = 0
+	Nodes = 0
 	Stopped = false
 }
