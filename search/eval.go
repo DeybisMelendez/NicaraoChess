@@ -125,6 +125,9 @@ func Evaluate(board *chess.Board, turn int) int {
 		}
 	}
 	if isEndgame(board) {
+		if IsDraw(board) {
+			return 0
+		}
 		return endgame * turn // Endgame
 	}
 	phase = ((phase * 256) + (TotalPhase / 2)) / TotalPhase

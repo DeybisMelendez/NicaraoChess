@@ -61,7 +61,6 @@ func isReady() {
 }
 
 func uciNewGame() {
-	//search.SetHashTable(search.Mb)
 	search.ClearSearch()
 	board = chess.ParseFen(startpos)
 }

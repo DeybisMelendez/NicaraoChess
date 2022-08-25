@@ -28,6 +28,7 @@
     - Null Move Reduction
     - Razoring
     - Late Move Reduction (LMR)
+    - Futility Pruning
     - Quiescence
 
 ### Evaluation
@@ -36,11 +37,11 @@
 - Piece Square Table
 - Evaluation of pieces
 - Tapered eval
+- Basic Draw Evaluation
 
 ### TODO
 
 - Aspiration Window
-- Futility Pruning
 - Draw Evaluation
 - Mop-up Evaluation
 - Internal Iterative Deepening
