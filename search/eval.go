@@ -25,7 +25,6 @@ var phase int = TotalPhase
 
 func Evaluate(board *chess.Board, turn int) int {
 	opening, endgame := 0, 0
-
 	whitePawnCount := int(bits.OnesCount64(board.White.Pawns))
 	blackPawnCount := int(bits.OnesCount64(board.White.Pawns))
 	allPieces := board.White.All | board.Black.All

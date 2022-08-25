@@ -12,7 +12,7 @@ func StoreKillerMove(move chess.Move, board *chess.Board, ply int) {
 }
 
 func IsKillerMove(move chess.Move, ply int) bool {
-	return KillerMoves[0][ply] == move && KillerMoves[1][ply] == move
+	return KillerMoves[0][ply] == move || KillerMoves[1][ply] == move
 }
 
 func ResetKillerMoves() {

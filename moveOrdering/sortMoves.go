@@ -9,38 +9,34 @@ import (
 
 var FollowPV bool
 
-func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, color int, ply int) int {
+func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, isWhite bool, ply int) int {
 	score := 0
 	piece, _ := utils.GetPiece(move.From(), board)
-	historyMove := GetHistoryMove(color, piece, move.To())
+	historyMove := GetHistoryMove(isWhite, piece, move.To())
 	if move == bestmove {
-		score = 6000000
+		score = 5000
 	} else if ply > 0 && FollowPV {
 		FollowPV = false
 		if move == pvMove {
 			FollowPV = true
-			score = 5000000
+			score = 4000
 		}
+	} else if chess.IsCapture(move, board) {
+		score = GetMVV_LVA(move, board) + 3000
 	} else if KillerMoves[0][ply] == move {
-		score = 4000000
+		score = 2000
 	} else if KillerMoves[1][ply] == move {
-		score = 3000000
-	} else if historyMove != 0 {
-		score = 2000000 + historyMove
+		score = 1000
 	} else {
-		score = GetMVV_LVA(move, board)
+		score = historyMove
 	}
 	return score
 }
 
 func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmove chess.Move, ply int) {
-	color := -1
-	if board.Wtomove {
-		color = 1
-	}
 	sort.Slice(moves, func(a, b int) bool {
-		valueA := valueMove(board, moves[a], pvMove, bestmove, color, ply)
-		valueB := valueMove(board, moves[b], pvMove, bestmove, color, ply)
+		valueA := valueMove(board, moves[a], pvMove, bestmove, board.Wtomove, ply)
+		valueB := valueMove(board, moves[b], pvMove, bestmove, board.Wtomove, ply)
 		return valueA > valueB
 	})
 }

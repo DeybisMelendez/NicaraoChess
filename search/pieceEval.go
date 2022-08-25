@@ -145,6 +145,9 @@ func GoodRook(pawns int) int {
 	return 32 - (pawns * 2)
 }
 
+// https://www.chessprogramming.org/Knight_Pattern
+// TODO Mobility Knight
+
 func MobilityRook(square uint8, allPieces uint64, myPieces uint64) int {
 	return bits.OnesCount64(chess.CalculateRookMoveBitboard(square, allPieces)&(^myPieces)) * 2
 }

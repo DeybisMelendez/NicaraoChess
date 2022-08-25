@@ -8,7 +8,7 @@ import (
 
 const DoNull = true
 const NoNull = false
-const NullMoveR = 3
+const NullMoveR = 2
 const NullMoveFails = 10000
 
 func NullMove(fen string, depth int, beta int, turn int) int {

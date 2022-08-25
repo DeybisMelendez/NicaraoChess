@@ -18,6 +18,7 @@ var Bestmove chess.Move
 
 func Search(board *chess.Board, stopTime int64, depth int) {
 	score := 0
+	Nodes = 0
 	scoreType := "cp"
 	alpha := -Infinity
 	beta := Infinity

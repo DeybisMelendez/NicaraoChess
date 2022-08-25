@@ -1,8 +1,6 @@
 package search
 
 import (
-	"fmt"
-
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
@@ -10,15 +8,10 @@ import (
 var RepetitionTable = [150]uint64{}
 
 func IsRepetition(hash uint64) bool {
-	//var count int = 0
 	for i := 0; i < Ply; i++ {
 		if hash == RepetitionTable[i] {
-			fmt.Println("repetition")
 			return true
 		}
-		/*if count > 1 {
-			return true
-		}*/
 	}
 	return false
 }
