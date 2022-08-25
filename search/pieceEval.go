@@ -7,6 +7,10 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
+var MaterialOpening = [7]int{0, 90, 320, 330, 500, 900, 10000}
+var MaterialEndgame = [7]int{0, 100, 320, 350, 550, 900, 10000}
+var MaterialScore = [2][7]int{MaterialOpening, MaterialEndgame} //Opening, Endgame
+
 const WhiteColorBoard uint64 = 0xAA55AA55AA55AA55
 const BlackColorBoard uint64 = 0x55AA55AA55AA55AA
 const Center uint64 = 0x1818000000
@@ -109,8 +113,8 @@ func PassedPawns(pawns uint64, square uint8, isWhite bool) int {
 	return 0
 }
 
-func BadKnight(pawns int) int {
-	return 16 - pawns
+func GoodKnight(pawns int) int {
+	return pawns * 2
 }
 
 func BishopPair(bishops uint64) int {
@@ -126,12 +130,12 @@ func BadBishop(square uint8, pawns uint64) int {
 	// White
 	if squareMask&WhiteColorBoard > 0 {
 		if bits.OnesCount64(pawns&WhiteColorBoard) > 3 {
-			score += 20
+			score += 10
 		}
 	}
 	if squareMask&BlackColorBoard > 0 {
 		if bits.OnesCount64(pawns&BlackColorBoard) > 3 {
-			score += 20
+			score += 10
 		}
 	}
 	return score
@@ -156,19 +160,36 @@ func BadQueen(board *chess.Board, byBlack bool, square uint8) int {
 	return 0
 }
 
-func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool) int {
-	return MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)
+func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool, queens uint64) int {
+	score := MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)
+	if isEndgame && queens != 0 {
+		return score
+	}
+	return score
 }
 
-func CenterPawn(square uint8, isEndgame bool) int {
-	if !isEndgame { //Opening
-		squareMask := uint64(1) << square
-		if Center&squareMask != 0 {
-			return 20
+func AttackedKing(incheck bool, isWhite bool, isOpening bool) int {
+	score := 30
+	if isOpening {
+		score = 20
+	}
+	if incheck {
+		if isWhite {
+			return score
+		} else {
+			return -score
 		}
-		if ExtendedCenter&squareMask != 0 {
-			return 10
-		}
+	}
+	return 0
+}
+
+func CenterPawn(square uint8) int {
+	squareMask := uint64(1) << square
+	if Center&squareMask != 0 {
+		return 20
+	}
+	if ExtendedCenter&squareMask != 0 {
+		return 10
 	}
 	return 0
 }

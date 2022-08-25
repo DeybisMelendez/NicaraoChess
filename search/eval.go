@@ -12,10 +12,6 @@ import (
 const WHITE, BLACK = 0, 1
 const OPENING, ENDGAME = 0, 1
 
-var MaterialOpening = [7]int{0, 90, 320, 330, 500, 900, 10000}
-var MaterialEndgame = [7]int{0, 100, 320, 350, 550, 900, 10000}
-var MaterialScore = [2][7]int{MaterialOpening, MaterialEndgame} //Opening, Endgame
-
 var KnightPhase int = 1
 var BishopPhase int = 1
 var RookPhase int = 2
@@ -49,14 +45,14 @@ func Evaluate(board *chess.Board, turn int) int {
 					val := PassedPawns(board.White.Pawns, square, true)
 					val -= DoublePawns(board.White.Pawns, square)
 					val -= IsolatedPawns(board.White.Pawns, square)
-					opening += CenterPawn(square, false)
+					opening += CenterPawn(square)
 					opening += val
 					endgame += val
 				case chess.Knight:
 					phase -= KnightPhase
-					val := BadKnight(allPawnCount)
-					opening -= val
-					endgame -= val
+					val := GoodKnight(allPawnCount)
+					opening += val
+					endgame += val
 				case chess.Bishop:
 					phase -= BishopPhase
 					val := BishopPair(board.White.Bishops)
@@ -79,7 +75,10 @@ func Evaluate(board *chess.Board, turn int) int {
 					endgame -= val
 
 				case chess.King:
-					opening -= BadKing(square, allPieces, board.White.All, false)
+					opening -= BadKing(square, allPieces, board.White.All, false, board.Black.Queens)
+					endgame -= BadKing(square, allPieces, board.Black.All, true, board.Black.Queens)
+					opening -= AttackedKing(board.OurKingInCheck(), board.Wtomove, true)
+					endgame -= AttackedKing(board.OurKingInCheck(), board.Wtomove, false)
 				}
 			} else {
 				opening -= MaterialScore[OPENING][piece]
@@ -92,14 +91,14 @@ func Evaluate(board *chess.Board, turn int) int {
 					val := PassedPawns(board.Black.Pawns, square, false)
 					val -= IsolatedPawns(board.Black.Pawns, square)
 					val -= DoublePawns(board.Black.Pawns, square)
-					opening -= CenterPawn(square, false)
+					opening -= CenterPawn(square)
 					opening -= val
 					endgame -= val
 				case chess.Knight:
 					phase -= KnightPhase
-					val := BadKnight(allPawnCount)
-					opening += val
-					endgame += val
+					val := GoodKnight(allPawnCount)
+					opening -= val
+					endgame -= val
 				case chess.Bishop:
 					phase -= BishopPhase
 					val := BishopPair(board.Black.Bishops)
@@ -119,7 +118,10 @@ func Evaluate(board *chess.Board, turn int) int {
 					opening += val
 					endgame += val
 				case chess.King:
-					opening += BadKing(square, allPieces, board.Black.All, false)
+					opening += BadKing(square, allPieces, board.Black.All, false, board.White.Queens)
+					endgame += BadKing(square, allPieces, board.Black.All, true, board.White.Queens)
+					opening += AttackedKing(board.OurKingInCheck(), board.Wtomove, true)
+					endgame += AttackedKing(board.OurKingInCheck(), board.Wtomove, false)
 				}
 			}
 		}

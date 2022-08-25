@@ -15,7 +15,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	var score int = 0
 	var bestmove chess.Move
 	var isPVNode bool = beta-alpha > 1
-	if IsThreeFoldRepetition(board.Hash()) {
+	if IsRepetition(board.Hash()) {
 		return 0
 	}
 	var hashScore = ReadHashEntry(board.Hash(), alpha, beta, depth, &bestmove)
