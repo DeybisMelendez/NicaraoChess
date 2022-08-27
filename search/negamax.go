@@ -76,6 +76,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	}
 	moveList := board.GenerateLegalMoves()
 	moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
+	//fmt.Println(moveList)
 	var movesSearched int = 0
 	for _, move := range moveList {
 		var isCapture bool = chess.IsCapture(move, board)

@@ -151,15 +151,15 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 	alpha = utils.Max(alpha, standPat)
 	moves := filterCaptures(board.GenerateLegalMoves(), board)
 	var score int = 0
-	for i := 0; i < len(moves); i++ {
+	for _, move := range moves {
 		if isTimeToStop() {
 			return 0
 		}
-		unmakeFunc := Make(board, moves[i])
+		unmakeFunc := Make(board, move)
 		score = -Quiesce(board, -beta, -alpha, -turn)
 		Unmake(unmakeFunc)
 		if score > alpha {
-			StorePV(moves[i])
+			StorePV(move)
 			alpha = score
 		}
 		if score >= beta {
