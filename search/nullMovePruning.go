@@ -8,11 +8,14 @@ import (
 
 const DoNull = true
 const NoNull = false
-const NullMoveR = 2
+const NullDepth = 3
+const NullDivisor = 6
 const NullMoveFails = 10000
 
-func NullMove(fen string, depth int, beta int, turn int) int {
+// R = null_depth + depth / null_divisor
+func NullMove(board *chess.Board, depth int, alpha int, beta int, turn int) int {
 	score := 0
+	var fen = board.ToFen()
 	if strings.Contains(fen, " w ") {
 		fen = strings.ReplaceAll(fen, " w ", " b ")
 	} else {
@@ -20,7 +23,12 @@ func NullMove(fen string, depth int, beta int, turn int) int {
 	}
 	nullBoard := chess.ParseFen(fen)
 	if !nullBoard.OurKingInCheck() && len(nullBoard.GenerateLegalMoves()) != 0 {
-		score = -Negamax(&nullBoard, depth-1-NullMoveR, -beta, -beta+1, -turn, NoNull)
+		var R = NullDepth + depth/NullDivisor
+		if depth-R-1 > 0 {
+			score = -Negamax(&nullBoard, depth-1-NullDepth, -beta, -beta+1, -turn, NoNull)
+		} else {
+			score = -Quiesce(&nullBoard, -beta, -alpha, -turn)
+		}
 		if score >= beta {
 			return beta
 		}

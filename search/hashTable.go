@@ -72,8 +72,8 @@ func ReadHashEntry(hash uint64, alpha int, beta int, depth int, move *chess.Move
 func SetHashTable(mb uint64) {
 	if mb < 4 {
 		Mb = 4
-	} else if mb > 128 {
-		Mb = 128
+	} else if mb > 256 {
+		Mb = 256
 	}
 	hashEntries = mb * 0x100000 / 20
 	InitHasTable()

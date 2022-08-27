@@ -28,16 +28,12 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if depth == 0 {
 		return Quiesce(board, alpha, beta, turn) //Evaluate(board,turn) //
 	}
-	/*// Mate Distance pruning
-	if alpha < -MateScore {
-		alpha = -MateScore
-	}
-	if beta > MateScore-1 {
-		beta = MateScore - 1
-	}
+	// Mate Distance pruning
+	alpha = utils.Max(alpha, -MateScore+Ply-1)
+	beta = utils.Min(beta, MateScore-Ply)
 	if alpha >= beta {
 		return alpha
-	}*/
+	}
 	//check extension
 	var inCheck bool = board.OurKingInCheck()
 	if inCheck {
@@ -55,8 +51,8 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		if nullMove {
 			//https://www.chessprogramming.org/Null_Move_Pruning#Schemes
 			//if Ply > 0 && depth > NullMoveR && AllowNullMove(board) && !isEndgame(board) {
-			if Ply > 0 && depth > NullMoveR && staticEval >= beta && !isEndgame(board) {
-				nullScore := NullMove(board.ToFen(), depth, beta, turn)
+			if Ply > 0 && depth > NullDepth && staticEval >= beta && !isEndgame(board) {
+				nullScore := NullMove(board, depth, alpha, beta, turn)
 				if nullScore != NullMoveFails {
 					return beta
 				}
@@ -76,14 +72,13 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	}
 	moveList := board.GenerateLegalMoves()
 	moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
-	//fmt.Println(moveList)
 	var movesSearched int = 0
 	for _, move := range moveList {
 		var isCapture bool = chess.IsCapture(move, board)
-		if depth == 1 && !isPVNode && movesSearched > 0 {
+		if depth < 4 && !isPVNode && movesSearched > 0 {
 			var staticEval int = Evaluate(board, turn)
 			var isPromotion bool = move.Promote() != chess.Nothing
-			if IsFutilityPruning(staticEval, alpha, board, inCheck, isCapture, isPromotion) {
+			if IsFutilityPruning(staticEval, depth, alpha, board, inCheck, isCapture, isPromotion) {
 				continue
 			}
 		}
