@@ -45,11 +45,11 @@ func setFileRankMask(fileNumber int, rankNumber int) uint64 {
 			var square uint64 = uint64(rank)*8 + uint64(file)
 			if fileNumber != -1 {
 				if file == fileNumber {
-					mask = mask | utils.SetBits(mask, square)
+					mask |= utils.SetBits(mask, square)
 				}
 			} else if rankNumber != -1 {
 				if rank == rankNumber {
-					mask = mask | utils.SetBits(mask, square)
+					mask |= utils.SetBits(mask, square)
 				}
 			}
 		}
@@ -88,13 +88,13 @@ func InitEvaluationMask() {
 
 func DoublePawns(pawns uint64, square uint8) int {
 	if bits.OnesCount64(pawns&FileMask[square]) > 1 {
-		return 10
+		return 50
 	}
 	return 0
 }
 func IsolatedPawns(pawns uint64, square uint8) int {
 	if pawns&IsolatedMask[square] == 0 {
-		return 10
+		return 20
 	}
 	return 0
 }
@@ -102,7 +102,7 @@ func IsolatedPawns(pawns uint64, square uint8) int {
 func PassedPawns(pawns uint64, square uint8, isWhite bool) int {
 	if isWhite {
 		if pawns&WhitePassedMask[square] == 0 {
-			return PassedPawnBonus[getRank[63-square]]
+			return PassedPawnBonus[getRank[ReversedBoard[square]]]
 		} else {
 			return 0
 		}
@@ -165,7 +165,10 @@ func BadQueen(board *chess.Board, byBlack bool, square uint8) int {
 
 func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool, queens uint64) int {
 	score := MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)
-	if isEndgame && queens != 0 {
+	if isEndgame {
+		if queens == 0 {
+			return -score
+		}
 		return score
 	}
 	return score

@@ -8,8 +8,8 @@ import (
 
 const DoNull = true
 const NoNull = false
-const NullDepth = 3
-const NullDivisor = 6
+const NullDepth = 6
+const NullDivisor = 4
 const NullMoveFails = 10000
 
 // R = null_depth + depth / null_divisor
@@ -25,7 +25,7 @@ func NullMove(board *chess.Board, depth int, alpha int, beta int, turn int) int 
 	if !nullBoard.OurKingInCheck() && len(nullBoard.GenerateLegalMoves()) != 0 {
 		var R = NullDepth + depth/NullDivisor
 		if depth-R-1 > 0 {
-			score = -Negamax(&nullBoard, depth-1-NullDepth, -beta, -beta+1, -turn, NoNull)
+			score = -Negamax(&nullBoard, depth-R-1, -beta, -beta+1, -turn, NoNull)
 		} else {
 			score = -Quiesce(&nullBoard, -beta, -alpha, -turn)
 		}

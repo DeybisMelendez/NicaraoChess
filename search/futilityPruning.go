@@ -1,19 +1,11 @@
 package search
 
-import (
-	"math"
+//var FutilityMargin = [4]int{0, 100,320,500,900,}
 
-	chess "github.com/dylhunn/dragontoothmg"
-)
-
-var FutilityMargin = [4]int{0, 90, 320, 500}
-
-func IsFutilityPruning(staticEval int, depth int, alpha int, board *chess.Board, inCheck bool, isCapture bool, isPromotion bool) bool {
-	if !isCapture && !inCheck && !isPromotion && !board.OurKingInCheck() {
-		var value int = staticEval + FutilityMargin[depth]
-		if int(math.Abs(float64(alpha))) < (MateScore-500) && value <= alpha {
-			return true
-		}
+/*func IsFutilityPruning(staticEval int, depth int, alpha int, board *chess.Board) bool {
+	var value int = staticEval + 100*depth*depth
+	if depth < 8 && int(math.Abs(float64(alpha))) < MateScore-500 && value <= alpha {
+		return true
 	}
 	return false
-}
+}*/
