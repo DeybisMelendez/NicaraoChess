@@ -29,11 +29,21 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		return Quiesce(board, alpha, beta, turn) //Evaluate(board,turn) //
 	}
 	// Mate Distance pruning
-	alpha = utils.Max(alpha, -MateScore+Ply-1)
-	beta = utils.Min(beta, MateScore-Ply)
-	if alpha >= beta {
-		return alpha
+	var matingValue int = MateValue - Ply
+	if matingValue < beta {
+		beta = matingValue
+		if alpha >= matingValue {
+			return matingValue
+		}
 	}
+	matingValue = -MateValue + Ply
+	if matingValue > alpha {
+		alpha = matingValue
+		if beta <= matingValue {
+			return matingValue
+		}
+	}
+
 	var inCheck bool = board.OurKingInCheck()
 	var staticEval int = Evaluate(board, turn)
 	var applyFutility bool
@@ -47,13 +57,10 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		}
 		//Futility pruning
 		var value int = staticEval + 100*depth*depth
-		if depth < 8 && int(math.Abs(float64(alpha))) < MateScore-500 && value <= alpha {
+		if depth < 8 && int(math.Abs(float64(alpha))) < MateScore && value <= alpha {
 			applyFutility = true
 		}
-
-	}
-	if !inCheck && !isPVNode {
-		if nullMove {
+		if nullMove && !inCheck {
 			//https://www.chessprogramming.org/Null_Move_Pruning#Schemes
 			//if Ply > 0 && depth > NullDepth && AllowNullMove(board) && !isEndgame(board) {
 			if Ply > 0 && depth > NullDepth && staticEval >= beta && !isEndgame(board) {
@@ -92,7 +99,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		unmakeFunc := Make(board, move)
 		//reductions
 		if !isPVNode && movesSearched > 0 && !tacticalMove {
-			if beta < MateScore-Ply && alpha > -MateScore+Ply {
+			if beta < MateValue-Ply && alpha > -MateValue+Ply {
 				newDepth -= 3
 				if newDepth < 1 {
 					newDepth = 1
@@ -127,7 +134,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			hashFlag = HashFlagExact
 			alpha = score
 			// Reduce other moves
-			if depth > 2 && depth < 7 && beta < MateScore-Ply && alpha > -MateScore+Ply {
+			if depth > 2 && depth < 7 && beta < MateValue-Ply && alpha > -MateValue+Ply {
 				depth--
 			}
 			if score >= beta {
@@ -141,7 +148,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if len == 0 {
 		if board.OurKingInCheck() {
 			//Checkmate
-			return -MateScore + Ply
+			return -MateValue + Ply
 		} else {
 			//Stalemate
 			return 0

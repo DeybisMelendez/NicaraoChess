@@ -44,40 +44,36 @@ func Find(a []string, x string) int {
 
 func GetPiece(square uint8, board *chess.Board) (int, bool) {
 	squareMask := uint64(1) << square
-	var isWhite bool = true
-	if board.Black.All&squareMask != 0 {
-		isWhite = false
-	}
-	if isWhite {
+	if board.White.All&squareMask != 0 {
 		if board.White.Pawns&squareMask != 0 {
-			return chess.Pawn, isWhite
+			return chess.Pawn, true
 		} else if board.White.Knights&squareMask != 0 {
-			return chess.Knight, isWhite
+			return chess.Knight, true
 		} else if board.White.Bishops&squareMask != 0 {
-			return chess.Bishop, isWhite
+			return chess.Bishop, true
 		} else if board.White.Rooks&squareMask != 0 {
-			return chess.Rook, isWhite
+			return chess.Rook, true
 		} else if board.White.Queens&squareMask != 0 {
-			return chess.Queen, isWhite
+			return chess.Queen, true
 		} else if board.White.Kings&squareMask != 0 {
-			return chess.King, isWhite
+			return chess.King, true
 		}
 	} else {
 		if board.Black.Pawns&squareMask != 0 {
-			return chess.Pawn, isWhite
+			return chess.Pawn, false
 		} else if board.Black.Knights&squareMask != 0 {
-			return chess.Knight, isWhite
+			return chess.Knight, false
 		} else if board.Black.Bishops&squareMask != 0 {
-			return chess.Bishop, isWhite
+			return chess.Bishop, false
 		} else if board.Black.Rooks&squareMask != 0 {
-			return chess.Rook, isWhite
+			return chess.Rook, false
 		} else if board.Black.Queens&squareMask != 0 {
-			return chess.Queen, isWhite
+			return chess.Queen, false
 		} else if board.Black.Kings&squareMask != 0 {
-			return chess.King, isWhite
+			return chess.King, false
 		}
 	}
-	return chess.Nothing, isWhite
+	return chess.Nothing, false
 }
 
 /*func Reverse(slc [64]int) [64]int {

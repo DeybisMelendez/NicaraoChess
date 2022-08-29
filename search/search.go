@@ -8,7 +8,8 @@ import (
 )
 
 const Infinity = 10000
-const MateScore = 8000
+const MateValue = 8000
+const MateScore = 7500
 
 var Ply int = 0
 var Nodes int = 0
@@ -39,11 +40,11 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			break
 		}
 		Bestmove = PVTable[0][0]
-		if score >= MateScore-500 {
-			score = (MateScore - score + 1) / 2
+		if score >= MateScore {
+			score = (MateValue - score + 1) / 2
 			scoreType = "mate"
-		} else if score <= -MateScore+500 {
-			score = (MateScore + score) / 2
+		} else if score <= -MateScore {
+			score = (MateValue + score) / 2
 			scoreType = "mate"
 		}
 		fmt.Println("info",

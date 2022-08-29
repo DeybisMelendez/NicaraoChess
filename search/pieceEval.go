@@ -16,7 +16,7 @@ const BlackColorBoard uint64 = 0x55AA55AA55AA55AA
 const Center uint64 = 0x1818000000
 const ExtendedCenter uint64 = 0x182424180000
 
-var PassedPawnBonus = [8]int{0, 10, 20, 40, 100, 200, 300, 400}
+var PassedPawnBonus = [8]int{0, 10, 20, 40, 100, 200, 400, 600}
 
 var Ranks = [8]uint64{0xff, 0xff00, 0xff0000, 0xff000000, 0xff00000000, 0xff0000000000, 0xff000000000000, 0xff00000000000000}
 var Files = [8]uint64{0x8080808080808080, 0x4040404040404040, 0x2020202020202020, 0x1010101010101010,
@@ -88,13 +88,13 @@ func InitEvaluationMask() {
 
 func DoublePawns(pawns uint64, square uint8) int {
 	if bits.OnesCount64(pawns&FileMask[square]) > 1 {
-		return 50
+		return 20
 	}
 	return 0
 }
 func IsolatedPawns(pawns uint64, square uint8) int {
 	if pawns&IsolatedMask[square] == 0 {
-		return 20
+		return 50
 	}
 	return 0
 }
@@ -125,20 +125,18 @@ func BishopPair(bishops uint64) int {
 }
 
 func BadBishop(square uint8, pawns uint64) int {
-	score := 0
 	squareMask := uint64(1) << square
 	// White
 	if squareMask&WhiteColorBoard > 0 {
 		if bits.OnesCount64(pawns&WhiteColorBoard) > 3 {
-			score += 10
+			return 10
 		}
-	}
-	if squareMask&BlackColorBoard > 0 {
+	} else if squareMask&BlackColorBoard > 0 {
 		if bits.OnesCount64(pawns&BlackColorBoard) > 3 {
-			score += 10
+			return 10
 		}
 	}
-	return score
+	return 0
 }
 
 func GoodRook(pawns int) int {
@@ -165,13 +163,10 @@ func BadQueen(board *chess.Board, byBlack bool, square uint8) int {
 
 func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool, queens uint64) int {
 	score := MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)
-	if isEndgame {
-		if queens == 0 {
-			return -score
-		}
-		return score
+	if isEndgame && queens == 0 {
+		return 0
 	}
-	return score
+	return score * 10
 }
 
 func AttackedKing(incheck bool, isWhite bool, isOpening bool) int {

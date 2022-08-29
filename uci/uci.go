@@ -93,7 +93,7 @@ func goCommand(command string) {
 		var clock int64 = -1
 		var stopTime int64 = -1
 		depth := -1
-		var movesToGo int64 = 50
+		var movesToGo int64 = 30
 		var moveTime int64 = -1
 		var inc int64 = 0
 		goCommand := strings.Fields(command)
