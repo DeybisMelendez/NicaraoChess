@@ -91,11 +91,11 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		}
 		var newDepth int = depth
 		//extensions
-		if depth > 9 {
+		/*if depth > 9 {
 			if givesCheck {
 				depth++
 			}
-		}
+		}*/
 		unmakeFunc := Make(board, move)
 		//reductions
 		if !isPVNode && movesSearched > 0 && !tacticalMove {

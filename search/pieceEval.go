@@ -2,7 +2,6 @@ package search
 
 import (
 	"math/bits"
-	"nicarao/utils"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
@@ -18,83 +17,15 @@ const ExtendedCenter uint64 = 0x182424180000
 
 var PassedPawnBonus = [8]int{0, 10, 20, 40, 100, 200, 400, 600}
 
-var Ranks = [8]uint64{0xff, 0xff00, 0xff0000, 0xff000000, 0xff00000000, 0xff0000000000, 0xff000000000000, 0xff00000000000000}
-var Files = [8]uint64{0x8080808080808080, 0x4040404040404040, 0x2020202020202020, 0x1010101010101010,
-	0x808080808080808, 0x404040404040404, 0x202020202020202, 0x101010101010101}
-
-var FileMask = [64]uint64{}
-var RankMask = [64]uint64{}
-var IsolatedMask = [64]uint64{}
-var WhitePassedMask = [64]uint64{}
-var BlackPassedMask = [64]uint64{}
-
-var getRank = [64]int{
-	7, 7, 7, 7, 7, 7, 7, 7,
-	6, 6, 6, 6, 6, 6, 6, 6,
-	5, 5, 5, 5, 5, 5, 5, 5,
-	4, 4, 4, 4, 4, 4, 4, 4,
-	3, 3, 3, 3, 3, 3, 3, 3,
-	2, 2, 2, 2, 2, 2, 2, 2,
-	1, 1, 1, 1, 1, 1, 1, 1,
-	0, 0, 0, 0, 0, 0, 0, 0}
-
-func setFileRankMask(fileNumber int, rankNumber int) uint64 {
-	var mask uint64 = 0
-	for rank := 0; rank < 8; rank++ {
-		for file := 0; file < 8; file++ {
-			var square uint64 = uint64(rank)*8 + uint64(file)
-			if fileNumber != -1 {
-				if file == fileNumber {
-					mask |= utils.SetBits(mask, square)
-				}
-			} else if rankNumber != -1 {
-				if rank == rankNumber {
-					mask |= utils.SetBits(mask, square)
-				}
-			}
-		}
-	}
-	return mask
-}
-
-func InitEvaluationMask() {
-	for rank := 0; rank < 8; rank++ {
-		for file := 0; file < 8; file++ {
-			var square int = rank*8 + file
-			FileMask[square] |= setFileRankMask(file, -1)
-			RankMask[square] |= setFileRankMask(-1, rank)
-			IsolatedMask[square] |= setFileRankMask(file-1, -1)
-			IsolatedMask[square] |= setFileRankMask(file+1, -1)
-		}
-	}
-	for rank := 0; rank < 8; rank++ {
-		for file := 0; file < 8; file++ {
-			var square int = rank*8 + file
-			WhitePassedMask[square] |= setFileRankMask(file-1, -1)
-			WhitePassedMask[square] |= setFileRankMask(file, -1)
-			WhitePassedMask[square] |= setFileRankMask(file+1, -1)
-			for i := 0; i < (8 - rank); i++ {
-				WhitePassedMask[square] &= ^RankMask[(7-i)*8+file]
-			}
-			BlackPassedMask[square] |= setFileRankMask(file-1, -1)
-			BlackPassedMask[square] |= setFileRankMask(file, -1)
-			BlackPassedMask[square] |= setFileRankMask(file+1, -1)
-			for i := 0; i < rank+1; i++ {
-				BlackPassedMask[square] &= ^RankMask[i*8+file]
-			}
-		}
-	}
-}
-
 func DoublePawns(pawns uint64, square uint8) int {
 	if bits.OnesCount64(pawns&FileMask[square]) > 1 {
-		return 20
+		return 10
 	}
 	return 0
 }
 func IsolatedPawns(pawns uint64, square uint8) int {
 	if pawns&IsolatedMask[square] == 0 {
-		return 50
+		return 10
 	}
 	return 0
 }
@@ -154,9 +85,13 @@ func MobilityBishop(square uint8, allPieces uint64, myPieces uint64) int {
 	return bits.OnesCount64(chess.CalculateBishopMoveBitboard(square, allPieces)&(^myPieces)) * 2
 }
 
+func MobilityKnight(square uint8, allPieces uint64) int {
+	return bits.OnesCount64(knightMasks[square]&(^allPieces)) * 2
+}
+
 func BadQueen(board *chess.Board, byBlack bool, square uint8) int {
 	if board.UnderDirectAttack(byBlack, square) {
-		return 40
+		return 30
 	}
 	return 0
 }

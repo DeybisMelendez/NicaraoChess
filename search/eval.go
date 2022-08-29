@@ -54,6 +54,7 @@ func Evaluate(board *chess.Board, turn int) int {
 				case chess.Knight:
 					phase -= KnightPhase
 					val := GoodKnight(allPawnCount)
+					val += MobilityKnight(square, allPieces)
 					opening += val
 					endgame += val
 				case chess.Bishop:
@@ -100,6 +101,7 @@ func Evaluate(board *chess.Board, turn int) int {
 				case chess.Knight:
 					phase -= KnightPhase
 					val := GoodKnight(allPawnCount)
+					val += MobilityKnight(square, allPieces)
 					opening -= val
 					endgame -= val
 				case chess.Bishop:

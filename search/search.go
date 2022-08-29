@@ -3,6 +3,7 @@ package search
 import (
 	"fmt"
 	"nicarao/moveOrdering"
+	"time"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
@@ -29,6 +30,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	if board.Wtomove {
 		turn = 1
 	}
+	starting := time.Now().UnixMilli()
 	for { //Iterative Deepening
 		// TODO detener en jaque mate
 		if depth == 0 {
@@ -51,6 +53,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			"depth", currDepth,
 			"score", scoreType, score,
 			"nodes", Nodes,
+			"time", time.Now().UnixMilli()-starting,
 			"pv", FormatPV(PVTable[0]))
 		/*if scoreType == "mate" {
 			break
