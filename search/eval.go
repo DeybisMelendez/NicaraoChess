@@ -25,18 +25,23 @@ var phase int = TotalPhase
 
 func Evaluate(board *chess.Board, turn int) int {
 	opening, endgame := 0, 0
-	whitePawnCount := int(bits.OnesCount64(board.White.Pawns))
-	blackPawnCount := int(bits.OnesCount64(board.White.Pawns))
+	whitePawnCount := bits.OnesCount64(board.White.Pawns)
+	blackPawnCount := bits.OnesCount64(board.White.Pawns)
 	allPieces := board.White.All | board.Black.All
 	allPawnCount := whitePawnCount + blackPawnCount
 	opening += bits.OnesCount64(board.White.Pawns&Center) * 20
 	opening -= bits.OnesCount64(board.Black.Pawns&Center) * 20
 	opening += bits.OnesCount64(board.White.Pawns&ExtendedCenter) * 10
 	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10
-
+	all := bits.OnesCount64(allPieces)
+	var count int
 	for square := uint8(0); square < 64; square++ {
-		piece, isWhite := utils.GetPiece(square, board)
-		if piece != chess.Nothing {
+		if count >= all {
+			break
+		}
+		if (uint64(1)<<square)&allPieces != 0 {
+			count++
+			piece, isWhite := utils.GetPiece(square, board)
 			//Material & PST Evaluation
 			if isWhite {
 				opening += MaterialScore[OPENING][piece]

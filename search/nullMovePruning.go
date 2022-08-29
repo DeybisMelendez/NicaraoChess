@@ -1,27 +1,20 @@
 package search
 
 import (
-	"strings"
-
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
 const DoNull = true
 const NoNull = false
-const NullDepth = 6
-const NullDivisor = 4
+const NullDepth = 2
+const NullDivisor = 6
 const NullMoveFails = 10000
 
 // R = null_depth + depth / null_divisor
 func NullMove(board *chess.Board, depth int, alpha int, beta int, turn int) int {
 	score := 0
-	var fen = board.ToFen()
-	if strings.Contains(fen, " w ") {
-		fen = strings.ReplaceAll(fen, " w ", " b ")
-	} else {
-		fen = strings.ReplaceAll(fen, " b ", " w ")
-	}
-	nullBoard := chess.ParseFen(fen)
+	nullBoard := *board
+	nullBoard.Wtomove = !nullBoard.Wtomove
 	if !nullBoard.OurKingInCheck() && len(nullBoard.GenerateLegalMoves()) != 0 {
 		var R = NullDepth + depth/NullDivisor
 		if depth-R-1 > 0 {
