@@ -189,7 +189,7 @@ func AttackedKing(incheck bool, isWhite bool, isOpening bool) int {
 	return 0
 }
 
-func CenterPawn(square uint8) int {
+/*func CenterPawn(square uint8) int {
 	squareMask := uint64(1) << square
 	if Center&squareMask != 0 {
 		return 20
@@ -198,4 +198,4 @@ func CenterPawn(square uint8) int {
 		return 10
 	}
 	return 0
-}
+}*/

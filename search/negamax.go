@@ -50,11 +50,6 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		if depth < 8 && int(math.Abs(float64(alpha))) < MateScore-500 && value <= alpha {
 			applyFutility = true
 		}
-		//if beta < MateScore-Ply && alpha > -MateScore+Ply {
-		/*if IsFutilityPruning(staticEval, depth, alpha, board) && !inCheck {
-			return staticEval
-		}*/
-		//}
 
 	}
 	if !inCheck && !isPVNode {
@@ -73,36 +68,38 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		}
 	}
 	moveList := board.GenerateLegalMoves()
-	moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
+	len := len(moveList)
+	if len > 1 {
+		moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
+	}
 	var movesSearched int = 0
 	for _, move := range moveList {
 		var isCapture bool = chess.IsCapture(move, board)
 		var givesCheck bool = board.OurKingInCheck()
 		var isPromotion bool = move.Promote() != chess.Nothing
-		if applyFutility && movesSearched > 0 && !isCapture && !isPromotion && !givesCheck && !inCheck {
+		var isKillerMove bool = moveOrdering.IsKillerMove(move, Ply)
+		var tacticalMove bool = isCapture || givesCheck || isPromotion || isKillerMove || inCheck
+		if applyFutility && !isPVNode && movesSearched > 0 && !tacticalMove {
 			continue
 		}
 		var newDepth int = depth
 		//extensions
 		if depth > 9 {
-			if givesCheck || inCheck || moveOrdering.IsKillerMove(move, Ply) {
-				newDepth++
-			} else {
-				square := move.From()
-				piece, isWhite := utils.GetPiece(square, board)
-				if moveOrdering.GetHistoryMove(isWhite, piece, square) > 100 {
-					newDepth++
-				}
-			}
-		}
-		//reductions
-		if !isPVNode && bestmove != move && !inCheck && !givesCheck && !isCapture && move.Promote() == chess.Nothing && !moveOrdering.IsKillerMove(move, Ply) {
-			newDepth -= 3
-			if newDepth <= 0 {
-				return Quiesce(board, alpha, beta, turn)
+			if givesCheck {
+				depth++
 			}
 		}
 		unmakeFunc := Make(board, move)
+		//reductions
+		if !isPVNode && movesSearched > 0 && !tacticalMove {
+			if beta < MateScore-Ply && alpha > -MateScore+Ply {
+				newDepth -= 3
+				if newDepth < 1 {
+					newDepth = 1
+				}
+			}
+
+		}
 		if movesSearched == 0 {
 			score = -Negamax(board, newDepth-1, -beta, -alpha, -turn, DoNull)
 		} else {
@@ -141,7 +138,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		}
 	}
 
-	if len(moveList) == 0 {
+	if len == 0 {
 		if board.OurKingInCheck() {
 			//Checkmate
 			return -MateScore + Ply

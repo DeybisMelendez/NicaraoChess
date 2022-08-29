@@ -29,6 +29,10 @@ func Evaluate(board *chess.Board, turn int) int {
 	blackPawnCount := int(bits.OnesCount64(board.White.Pawns))
 	allPieces := board.White.All | board.Black.All
 	allPawnCount := whitePawnCount + blackPawnCount
+	opening += bits.OnesCount64(board.White.Pawns&Center) * 20
+	opening -= bits.OnesCount64(board.Black.Pawns&Center) * 20
+	opening += bits.OnesCount64(board.White.Pawns&ExtendedCenter) * 10
+	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10
 
 	for square := uint8(0); square < 64; square++ {
 		piece, isWhite := utils.GetPiece(square, board)
@@ -44,7 +48,7 @@ func Evaluate(board *chess.Board, turn int) int {
 					val := PassedPawns(board.White.Pawns, square, true)
 					val -= DoublePawns(board.White.Pawns, square)
 					val -= IsolatedPawns(board.White.Pawns, square)
-					opening += CenterPawn(square)
+					//opening += CenterPawn(square)
 					opening += val
 					endgame += val
 				case chess.Knight:
@@ -90,7 +94,7 @@ func Evaluate(board *chess.Board, turn int) int {
 					val := PassedPawns(board.Black.Pawns, square, false)
 					val -= IsolatedPawns(board.Black.Pawns, square)
 					val -= DoublePawns(board.Black.Pawns, square)
-					opening -= CenterPawn(square)
+					//opening -= CenterPawn(square)
 					opening -= val
 					endgame -= val
 				case chess.Knight:
@@ -131,6 +135,7 @@ func Evaluate(board *chess.Board, turn int) int {
 		}
 		return endgame * turn // Endgame
 	}
+	//opening += Mobility(board)
 	phase = ((phase * 256) + (TotalPhase / 2)) / TotalPhase
 	score := ((opening * (256 - phase)) + (opening * phase)) / 256
 	return score * turn
