@@ -36,7 +36,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 		if depth == 0 {
 			break
 		}
-		moveOrdering.FollowPV = true
+		//moveOrdering.FollowPV = true
 		score = Negamax(board, currDepth, alpha, beta, turn, DoNull)
 		if isTimeToStop() {
 			break
@@ -55,9 +55,9 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			"nodes", Nodes,
 			"time", time.Now().UnixMilli()-starting,
 			"pv", FormatPV(PVTable[0]))
-		/*if scoreType == "mate" {
+		if scoreType == "mate" {
 			break
-		}*/
+		}
 		ResetGlobalVariables()
 		depth--
 		currDepth++

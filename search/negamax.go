@@ -3,7 +3,6 @@ package search
 import (
 	"math"
 	"nicarao/moveOrdering"
-	"nicarao/utils"
 	"time"
 
 	chess "github.com/dylhunn/dragontoothmg"
@@ -46,31 +45,16 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 
 	var inCheck bool = board.OurKingInCheck()
 	var staticEval int = Evaluate(board, turn)
-	var applyFutility bool
-	if !isPVNode {
-		// Razoring segun stockfish
-		if depth == 2 && staticEval < alpha-900 {
-			var newScore int = Quiesce(board, alpha, beta, turn)
-			if newScore < beta {
-				return utils.Max(newScore, score)
+	if nullMove && !isPVNode && !inCheck {
+		//https://www.chessprogramming.org/Null_Move_Pruning#Schemes
+		//if Ply > 0 && depth > NullDepth && AllowNullMove(board) && !isEndgame(board) {
+		if Ply > 0 && depth > NullDepth && staticEval >= beta && !isEndgame(board) {
+			nullScore := NullMove(board, depth, alpha, beta, turn)
+			if nullScore != NullMoveFails {
+				return beta
 			}
-		}
-		//Futility pruning
-		var value int = staticEval + 100*depth*depth
-		if depth < 4 && int(math.Abs(float64(alpha))) < MateScore && value <= alpha {
-			applyFutility = true
-		}
-		if nullMove && !inCheck {
-			//https://www.chessprogramming.org/Null_Move_Pruning#Schemes
-			//if Ply > 0 && depth > NullDepth && AllowNullMove(board) && !isEndgame(board) {
-			if Ply > 0 && depth > NullDepth && staticEval >= beta && !isEndgame(board) {
-				nullScore := NullMove(board, depth, alpha, beta, turn)
-				if nullScore != NullMoveFails {
-					return beta
-				}
-				if isTimeToStop() {
-					return 0
-				}
+			if isTimeToStop() {
+				return 0
 			}
 		}
 	}
@@ -80,38 +64,46 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
 	}
 	var movesSearched int = 0
+	sqrtDepth := math.Sqrt(float64(depth - 1))
+	sqrtCount := math.Sqrt(float64(len - 1))
+	R := int(math.Sqrt(sqrtDepth + sqrtCount))
 	for _, move := range moveList {
 		var isCapture bool = chess.IsCapture(move, board)
 		var givesCheck bool = board.OurKingInCheck()
 		var isPromotion bool = move.Promote() != chess.Nothing
 		var isKillerMove bool = moveOrdering.IsKillerMove(move, Ply)
-		from := move.From()
-		piece, isWhite := utils.GetPiece(from, board)
-		var isHistoryMove bool = moveOrdering.GetHistoryMove(isWhite, piece, from) > 50*depth
-		var tacticalMove bool = isCapture || inCheck || givesCheck || isPromotion || isKillerMove || isHistoryMove
-		if applyFutility && movesSearched > 0 && !tacticalMove {
-			continue
-		}
-		var newDepth int = depth
-		unmakeFunc := Make(board, move)
-		//reductions
-		if !isPVNode && !tacticalMove && newDepth > 5 {
-			if beta < MateValue-Ply && alpha > -MateValue+Ply {
-				newDepth -= 3
+		var nonTactical bool = !isCapture && !inCheck && !givesCheck && !isPromotion && !isKillerMove
+		if nonTactical {
+			// Razoring segun stockfish
+			/*if depth == 2 && staticEval < alpha+1800 {
+				var newScore int = Quiesce(board, alpha, beta, turn)
+				if newScore < beta {
+					return utils.Max(newScore, score)
+				}
+			}*/
+			//Futility pruning
+			var value int = staticEval + 60
+			if depth == 1 && int(math.Abs(float64(alpha))) < MateScore && value <= alpha {
+				continue
 			}
 		}
+		var newDepth int = depth * 2 / 3
+		if !nonTactical {
+			newDepth++
+		}
+		unmakeFunc := Make(board, move)
 		if movesSearched == 0 {
-			score = -Negamax(board, newDepth-1, -beta, -alpha, -turn, DoNull)
+			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
-			if movesSearched > 4 && !tacticalMove && depth > 2 {
-				score = -Negamax(board, depth*2/3, -alpha-1, -alpha, -turn, DoNull)
+			if movesSearched > 4 && nonTactical && depth > 2 {
+				score = -Negamax(board, R, -alpha-1, -alpha, -turn, DoNull)
 			} else {
 				score = alpha + 1
 			}
 			if score > alpha {
-				score = -Negamax(board, newDepth-1, -alpha-1, -alpha, -turn, DoNull)
+				score = -Negamax(board, newDepth, -alpha-1, -alpha, -turn, DoNull)
 				if score > alpha && score < beta {
-					score = -Negamax(board, newDepth-1, -beta, -alpha, -turn, DoNull)
+					score = -Negamax(board, newDepth, -beta, -alpha, -turn, DoNull)
 				}
 			}
 		}
@@ -127,9 +119,9 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			hashFlag = HashFlagExact
 			alpha = score
 			// Reduce other moves
-			if depth > 1 {
+			/*if depth > 2 {
 				depth--
-			}
+			}*/
 			if score >= beta {
 				moveOrdering.StoreKillerMove(move, board, Ply)
 				WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta, move)

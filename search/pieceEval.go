@@ -2,6 +2,7 @@ package search
 
 import (
 	"math/bits"
+	"nicarao/utils"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
@@ -15,7 +16,7 @@ const BlackColorBoard uint64 = 0x55AA55AA55AA55AA
 const Center uint64 = 0x1818000000
 const ExtendedCenter uint64 = 0x182424180000
 
-var PassedPawnBonus = [8]int{0, 10, 20, 40, 100, 200, 400, 600}
+var PassedPawnBonus = [8]int{0, 10, 20, 40, 60, 80, 100, 200}
 
 func DoublePawns(pawns uint64, square uint8) int {
 	if bits.OnesCount64(pawns&FileMask[square]) > 1 {
@@ -30,10 +31,12 @@ func IsolatedPawns(pawns uint64, square uint8) int {
 	return 0
 }
 
+// TODO problema con peon pasado, falla
 func PassedPawns(pawns uint64, square uint8, isWhite bool) int {
 	if isWhite {
+		utils.PrintBits(WhitePassedMask[ReversedBoard[square]])
 		if pawns&WhitePassedMask[square] == 0 {
-			return PassedPawnBonus[getRank[ReversedBoard[square]]]
+			return PassedPawnBonus[getRank[square]]
 		} else {
 			return 0
 		}
@@ -50,7 +53,7 @@ func GoodKnight(pawns int) int {
 
 func BishopPair(bishops uint64) int {
 	if bits.OnesCount64(bishops) > 1 {
-		return 10 // Con 2 alfiles sumará 20
+		return 20
 	}
 	return 0
 }
@@ -75,7 +78,6 @@ func GoodRook(pawns int) int {
 }
 
 // https://www.chessprogramming.org/Knight_Pattern
-// TODO Mobility Knight
 
 func MobilityRook(square uint8, allPieces uint64, myPieces uint64) int {
 	return bits.OnesCount64(chess.CalculateRookMoveBitboard(square, allPieces)&(^myPieces)) * 2
@@ -96,9 +98,9 @@ func BadQueen(board *chess.Board, byBlack bool, square uint8) int {
 	return 0
 }
 
-func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool, queens uint64) int {
+func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool) int {
 	score := MobilityRook(square, allPieces, myPieces) + MobilityBishop(square, allPieces, myPieces)
-	if isEndgame && queens == 0 {
+	if isEndgame {
 		return 0
 	}
 	return score * 10

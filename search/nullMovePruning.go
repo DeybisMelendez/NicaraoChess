@@ -6,7 +6,7 @@ import (
 
 const DoNull = true
 const NoNull = false
-const NullDepth = 2
+const NullDepth = 3
 const NullDivisor = 6
 const NullMoveFails = 10000
 

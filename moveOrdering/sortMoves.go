@@ -7,22 +7,22 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-var FollowPV bool
+//var FollowPV bool
 
 func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, isWhite bool, ply int) int {
-	if move == bestmove {
+	if move == pvMove {
 		return 5000
-	} else if move == pvMove {
+	} else if move == bestmove {
 		return 4000
-	} else if chess.IsCapture(move, board) || move.Promote() != chess.Nothing {
-		return GetMVV_LVA(move, board) + 3000
 	} else if KillerMoves[0][ply] == move {
-		return 2000
+		return 3000
 	} else if KillerMoves[1][ply] == move {
-		return 1000
+		return 2000
+	} else if chess.IsCapture(move, board) || move.Promote() != chess.Nothing {
+		return GetMVV_LVA(move, board) + 1000
 	} else {
 		piece, _ := utils.GetPiece(move.From(), board)
-		return GetHistoryMove(isWhite, piece, move.To()) + GetMVV_LVA(move, board)
+		return GetHistoryMove(isWhite, piece, move.To()) // + GetMVV_LVA(move, board)
 	}
 }
 
