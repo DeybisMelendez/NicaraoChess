@@ -103,7 +103,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		if movesSearched == 0 {
 			score = -Negamax(board, newDepth-1, -beta, -alpha, -turn, DoNull)
 		} else {
-			if movesSearched > 4 && !tacticalMove {
+			if movesSearched > 4 && !tacticalMove && depth > 2 {
 				score = -Negamax(board, depth*2/3, -alpha-1, -alpha, -turn, DoNull)
 			} else {
 				score = alpha + 1
@@ -127,7 +127,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			hashFlag = HashFlagExact
 			alpha = score
 			// Reduce other moves
-			if depth > 1 && beta < MateValue-Ply && alpha > -MateValue+Ply {
+			if depth > 1 {
 				depth--
 			}
 			if score >= beta {

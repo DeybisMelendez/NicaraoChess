@@ -30,12 +30,25 @@ func Evaluate(board *chess.Board, turn int) int {
 	allPieces := board.White.All | board.Black.All
 	allPawnCount := whitePawnCount + blackPawnCount
 	inCheck := board.OurKingInCheck()
+	all := bits.OnesCount64(allPieces)
+	var count int
+	// Material Score
+	/*opening += bits.OnesCount64(board.White.Pawns) * MaterialScore[OPENING][chess.Pawn]
+	opening += bits.OnesCount64(board.White.Knights) * MaterialScore[OPENING][chess.Knight]
+	opening += bits.OnesCount64(board.White.Bishops) * MaterialScore[OPENING][chess.Bishop]
+	opening += bits.OnesCount64(board.White.Rooks) * MaterialScore[OPENING][chess.Rook]
+	opening += bits.OnesCount64(board.White.Queens) * MaterialScore[OPENING][chess.Queen]
+	opening -= bits.OnesCount64(board.Black.Pawns) * MaterialScore[OPENING][chess.Pawn]
+	opening -= bits.OnesCount64(board.Black.Knights) * MaterialScore[OPENING][chess.Knight]
+	opening -= bits.OnesCount64(board.Black.Bishops) * MaterialScore[OPENING][chess.Bishop]
+	opening -= bits.OnesCount64(board.Black.Rooks) * MaterialScore[OPENING][chess.Rook]
+	opening -= bits.OnesCount64(board.Black.Queens) * MaterialScore[OPENING][chess.Queen]
+	endgame = opening*/
+	//Pawn structure
 	opening += bits.OnesCount64(board.White.Pawns&Center) * 20
 	opening -= bits.OnesCount64(board.Black.Pawns&Center) * 20
 	opening += bits.OnesCount64(board.White.Pawns&ExtendedCenter) * 10
 	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10
-	all := bits.OnesCount64(allPieces)
-	var count int
 	for square := uint8(0); square < 64; square++ {
 		if count >= all {
 			break
@@ -50,13 +63,12 @@ func Evaluate(board *chess.Board, turn int) int {
 				opening += PST[OPENING][piece][ReversedBoard[square]]
 				endgame += PST[ENDGAME][piece][ReversedBoard[square]]
 				switch piece {
-				/*case chess.Pawn:
-				//val := PassedPawns(board.White.Pawns, square, true)
-				val := -DoublePawns(board.White.Pawns, square)
-				val -= IsolatedPawns(board.White.Pawns, square)
-				//opening += CenterPawn(square)
-				opening += val
-				endgame += val*/
+				case chess.Pawn:
+					val := PassedPawns(board.White.Pawns, square, true)
+					val -= DoublePawns(board.White.Pawns, square)
+					val -= IsolatedPawns(board.White.Pawns, square)
+					opening += val
+					endgame += val
 				case chess.Knight:
 					phase -= KnightPhase
 					val := GoodKnight(allPawnCount)
@@ -97,13 +109,13 @@ func Evaluate(board *chess.Board, turn int) int {
 				endgame -= PST[ENDGAME][piece][square]
 				//Piece Evaluation
 				switch piece {
-				/*case chess.Pawn:
-				//val := PassedPawns(board.Black.Pawns, square, false)
-				val := -IsolatedPawns(board.Black.Pawns, square)
-				val -= DoublePawns(board.Black.Pawns, square)
-				//opening -= CenterPawn(square)
-				opening -= val
-				endgame -= val*/
+				case chess.Pawn:
+					val := PassedPawns(board.Black.Pawns, square, false)
+					val -= IsolatedPawns(board.Black.Pawns, square)
+					val -= DoublePawns(board.Black.Pawns, square)
+					//opening -= CenterPawn(square)
+					opening -= val
+					endgame -= val
 				case chess.Knight:
 					phase -= KnightPhase
 					val := GoodKnight(allPawnCount)
