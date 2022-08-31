@@ -83,6 +83,8 @@ func position(command string) {
 					fmt.Println(err)
 				}
 				_ = board.Apply(move)
+				search.GamePly++
+				search.RepetitionTable[search.GamePly] = board.Hash()
 			}
 		}
 	}

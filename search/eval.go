@@ -4,7 +4,6 @@ import (
 	"math/bits"
 	"nicarao/moveOrdering"
 	"nicarao/utils"
-	"sort"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
@@ -48,10 +47,10 @@ func Evaluate(board *chess.Board, turn int) int {
 	opening = endgame
 
 	//Pawn structure
-	opening += bits.OnesCount64(board.White.Pawns&Center) * 20
+	/*opening += bits.OnesCount64(board.White.Pawns&Center) * 20
 	opening -= bits.OnesCount64(board.Black.Pawns&Center) * 20
 	opening += bits.OnesCount64(board.White.Pawns&ExtendedCenter) * 10
-	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10
+	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10*/
 	for square := uint8(bits.TrailingZeros64(allPieces)); square < 64-uint8(bits.LeadingZeros64(allPieces)); square++ {
 		if (uint64(1)<<square)&allPieces != 0 {
 			piece, isWhite := utils.GetPiece(square, board)
@@ -139,18 +138,28 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 }
 
 func filterCaptures(moves []chess.Move, board *chess.Board) []chess.Move {
-	var filteredCaptures []chess.Move
+	var captures []chess.Move
 	for _, move := range moves {
 		if chess.IsCapture(move, board) {
-			filteredCaptures = append(filteredCaptures, move)
+			captures = append(captures, move)
 		}
 	}
-	sort.Slice(filteredCaptures, func(a, b int) bool {
+	var n = len(captures)
+	for i := 0; i < n; i++ {
+		var minIdx = i
+		for j := i; j < n; j++ {
+			if moveOrdering.GetMVV_LVA(captures[j], board) > moveOrdering.GetMVV_LVA(captures[minIdx], board) {
+				minIdx = j
+			}
+		}
+		captures[i], captures[minIdx] = captures[minIdx], captures[i]
+	}
+	/*sort.Slice(filteredCaptures, func(a, b int) bool {
 		valueA := moveOrdering.GetMVV_LVA(filteredCaptures[a], board)
 		valueB := moveOrdering.GetMVV_LVA(filteredCaptures[b], board)
 		return valueA > valueB
-	})
-	return filteredCaptures
+	})*/
+	return captures
 }
 
 func getMinorPieces(board *chess.Board) int {

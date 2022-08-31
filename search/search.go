@@ -15,6 +15,7 @@ const DoNull = true
 const NoNull = false
 const NullDepth = 2
 
+var GamePly int = 0
 var Ply int = 0
 var Nodes int = 0
 var StopTime int64 = -1
@@ -76,4 +77,7 @@ func ClearSearch() {
 	ResetGlobalVariables()
 	moveOrdering.ResetKillerMoves()
 	moveOrdering.ResetHistoryMove()
+	var newRep = [1000]uint64{}
+	RepetitionTable = newRep
+	GamePly = 0
 }

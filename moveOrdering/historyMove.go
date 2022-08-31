@@ -1,8 +1,6 @@
 package moveOrdering
 
 import (
-	"math"
-
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
@@ -12,9 +10,9 @@ func StoreHistoryMove(move chess.Move, board *chess.Board, depth int) {
 	if !chess.IsCapture(move, board) {
 		//piece, _ := utils.GetPiece(move.To(), board)
 		if board.Wtomove {
-			historyMoves[0][move.From()][move.To()] += int(math.Pow(2, float64(depth)))
+			historyMoves[0][move.From()][move.To()] += depth * depth
 		} else {
-			historyMoves[1][move.From()][move.To()] += int(math.Pow(2, float64(depth)))
+			historyMoves[1][move.From()][move.To()] += depth * depth
 		}
 	}
 }

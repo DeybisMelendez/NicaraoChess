@@ -14,14 +14,15 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	var score int = 0
 	var bestmove chess.Move
 	var isPVNode bool = beta-alpha > 1
-	if IsRepetition(board.Hash()) {
-		return 0
-	}
+
 	var hashScore int = ReadHashEntry(board.Hash(), alpha, beta, depth, &bestmove)
 	if hashScore != NoHashEntry && Ply > 0 && !isPVNode {
 		return hashScore
 	}
 	if isTimeToStop() {
+		return 0
+	}
+	if IsRepetition(board.Hash()) {
 		return 0
 	}
 	if depth == 0 {
@@ -76,6 +77,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			// Razoring
 			if depth == 2 && staticEval+50 < alpha {
 				depth--
+				//Futility Pruning
 			} else if depth == 1 && staticEval+50 < alpha {
 				Unmake(unmakeFunc)
 				continue
@@ -145,6 +147,6 @@ func isTimeToStop() bool {
 func ResetGlobalVariables() {
 	Ply = 0
 	Stopped = false
-	var newRep = [150]uint64{}
-	RepetitionTable = newRep
+	/*var newRep = [150]uint64{}
+	RepetitionTable = newRep*/
 }

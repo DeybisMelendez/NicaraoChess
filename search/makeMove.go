@@ -5,10 +5,10 @@ import (
 )
 
 // https://www.youtube.com/watch?v=QhFtquEeffA
-var RepetitionTable = [150]uint64{}
+var RepetitionTable = [1000]uint64{}
 
 func IsRepetition(hash uint64) bool {
-	for i := 0; i < Ply; i++ {
+	for i := 0; i < GamePly; i++ {
 		if hash == RepetitionTable[i] {
 			return true
 		}
@@ -17,9 +17,10 @@ func IsRepetition(hash uint64) bool {
 }
 
 func Make(board *chess.Board, move chess.Move) func() {
-	RepetitionTable[Ply] = board.Hash()
 	Ply++
 	Nodes++
+	GamePly++
+	RepetitionTable[GamePly] = board.Hash()
 	f := board.Apply(move)
 
 	return f
@@ -27,5 +28,6 @@ func Make(board *chess.Board, move chess.Move) func() {
 
 func Unmake(f func()) {
 	Ply--
+	GamePly--
 	f()
 }
