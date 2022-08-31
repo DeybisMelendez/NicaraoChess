@@ -17,8 +17,6 @@ var BishopPhase int = 1
 var RookPhase int = 2
 var QueenPhase int = 4
 
-const Delta = 180
-
 var TotalPhase int = KnightPhase*4 +
 	BishopPhase*4 + RookPhase*4 + QueenPhase*2 //+PawnPhase*16
 var phase int = TotalPhase
@@ -78,8 +76,8 @@ func Evaluate(board *chess.Board, turn int) int {
 			case chess.Pawn:
 				val := DoublePawns(b.Pawns, square)
 				val += IsolatedPawns(b.Pawns, square)
-				opening += val * color
-				endgame += val * color
+				opening -= val * color
+				endgame -= val * color
 			case chess.Knight:
 				mobility := MobilityKnight(square, allPieces)
 				opening += mobility * color

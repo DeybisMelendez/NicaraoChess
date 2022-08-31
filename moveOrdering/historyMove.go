@@ -1,33 +1,33 @@
 package moveOrdering
 
 import (
-	"nicarao/utils"
+	"math"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-var historyMoves [2][7][64]int
+var historyMoves [2][64][64]int
 
 func StoreHistoryMove(move chess.Move, board *chess.Board, depth int) {
 	if !chess.IsCapture(move, board) {
-		piece, _ := utils.GetPiece(move.To(), board)
+		//piece, _ := utils.GetPiece(move.To(), board)
 		if board.Wtomove {
-			historyMoves[0][piece][move.To()] += depth * depth
+			historyMoves[0][move.From()][move.To()] += int(math.Pow(2, float64(depth)))
 		} else {
-			historyMoves[1][piece][move.To()] += depth * depth
+			historyMoves[1][move.From()][move.To()] += int(math.Pow(2, float64(depth)))
 		}
 	}
 }
 
-func GetHistoryMove(isWhite bool, piece int, square uint8) int {
+func GetHistoryMove(isWhite bool, move chess.Move) int {
 	if isWhite {
-		return historyMoves[0][piece][square]
+		return historyMoves[0][move.From()][move.To()]
 	}
-	return historyMoves[1][piece][square]
+	return historyMoves[1][move.From()][move.To()]
 }
 
 func ResetHistoryMove() {
-	var newHistoryMove [2][7][64]int
+	var newHistoryMove [2][64][64]int
 	historyMoves = newHistoryMove
 	/*for i := 0; i < 2; i++ {
 		for j := 0; j < 7; j++ {

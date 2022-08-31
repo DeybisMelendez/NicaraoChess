@@ -11,6 +11,9 @@ import (
 const Infinity = 10000
 const MateValue = 8000
 const MateScore = 7500
+const DoNull = true
+const NoNull = false
+const NullDepth = 2
 
 var Ply int = 0
 var Nodes int = 0
@@ -55,9 +58,9 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			"nodes", Nodes,
 			"time", time.Now().UnixMilli()-starting,
 			"pv", FormatPV(PVTable[0]))
-		if scoreType == "mate" {
+		/*if scoreType == "mate" {
 			break
-		}
+		}*/
 		ResetGlobalVariables()
 		depth--
 		currDepth++
