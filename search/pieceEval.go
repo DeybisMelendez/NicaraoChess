@@ -87,8 +87,8 @@ func MobilityBishop(square uint8, allPieces uint64, myPieces uint64) int {
 	return bits.OnesCount64(chess.CalculateBishopMoveBitboard(square, allPieces)&(^myPieces)) * 2
 }
 
-func MobilityKnight(square uint8, allPieces uint64) int {
-	return bits.OnesCount64(knightMasks[square]&(^allPieces)) * 2
+func MobilityKnight(square uint8, myPieces uint64) int {
+	return bits.OnesCount64(knightMasks[square]&(^myPieces)) * 2
 }
 
 func BadQueen(board *chess.Board, byBlack bool, square uint8) int {
@@ -103,7 +103,7 @@ func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool) in
 	if isEndgame {
 		return 0
 	}
-	return score * 10
+	return score * score / 2
 }
 
 func AttackedKing(incheck bool, isWhite bool, isOpening bool) int {

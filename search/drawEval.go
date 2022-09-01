@@ -7,11 +7,8 @@ import (
 )
 
 func IsDraw(board *chess.Board) bool {
-	if bits.OnesCount64(board.White.All|board.Black.All) == 2 {
-		return true
-	}
-	if bits.OnesCount64(board.White.Pawns|board.Black.Pawns) == 0 {
-		if bits.OnesCount64(board.White.Rooks|board.Black.Rooks) == 0 {
+	if board.White.Pawns|board.Black.Pawns == 0 {
+		if board.White.Rooks|board.Black.Rooks == 0 {
 			white := board.White.Knights | board.White.Bishops
 			black := board.Black.Knights | board.Black.Bishops
 			if bits.OnesCount64(white|black) < 2 {
@@ -25,6 +22,9 @@ func IsDraw(board *chess.Board) bool {
 				return true
 			}
 		}
+	}
+	if bits.OnesCount64(board.White.All|board.Black.All) == 2 {
+		return true
 	}
 	return false
 }
