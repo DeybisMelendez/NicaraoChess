@@ -9,7 +9,7 @@ import (
 // var FollowPV bool
 var Material = [7]int{0, 1, 3, 3, 5, 9, 10}
 
-func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, ply int) int {
+func ValueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, ply int) int {
 	if move == pvMove {
 		return 6000
 	} else if move == bestmove {
@@ -34,7 +34,7 @@ func valueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove 
 	}
 }
 
-func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmove chess.Move, ply int) {
+/*func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmove chess.Move, ply int) {
 	var n = len(moves)
 	for i := 0; i < n; i++ {
 		var minIdx = i
@@ -45,13 +45,4 @@ func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmo
 		}
 		moves[i], moves[minIdx] = moves[minIdx], moves[i]
 	}
-}
-
-/*func SortMoves(moves []chess.Move, board *chess.Board, pvMove chess.Move, bestmove chess.Move, ply int) {
-
-	sort.Slice(moves, func(a, b int) bool {
-		valueA := valueMove(board, moves[a], pvMove, bestmove, ply)
-		valueB := valueMove(board, moves[b], pvMove, bestmove, ply)
-		return valueA > valueB
-	})
 }*/

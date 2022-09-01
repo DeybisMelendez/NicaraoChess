@@ -60,13 +60,23 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		}
 	}
 	moveList := board.GenerateLegalMoves()
-	len := len(moveList)
-	//hay un gran cuello de botella aqui
-	if len > 1 {
-		moveOrdering.SortMoves(moveList, board, PVTable[0][Ply], bestmove, Ply)
-	}
 	var movesSearched int = 0
-	for _, move := range moveList {
+	var lenMoveList int = len(moveList)
+	for len(moveList) > 0 {
+		var val int = -1
+		var move chess.Move
+		var idx int = 0
+		var ln int = len(moveList)
+		for i := 0; i < ln; i++ {
+			var newVal int = moveOrdering.ValueMove(board, moveList[i], PVTable[0][Ply], bestmove, Ply)
+			if newVal > val {
+				val = newVal
+				idx = i
+			}
+		}
+		move = moveList[idx]
+		moveList = append(moveList[:idx], moveList[idx+1:]...)
+
 		var isCapture bool = chess.IsCapture(move, board)
 		var isPromotion bool = move.Promote() != chess.Nothing
 		unmakeFunc := Make(board, move)
@@ -117,7 +127,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		}
 	}
 
-	if len == 0 {
+	if lenMoveList == 0 {
 		if board.OurKingInCheck() {
 			//Checkmate
 			return -MateValue + Ply
