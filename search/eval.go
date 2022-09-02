@@ -247,9 +247,23 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		return alpha
 	}*/
 	alpha = utils.Max(alpha, standPat)
-	moves := filterCaptures(board.GenerateLegalMoves(), board)
+	moveList := captures(board.GenerateLegalMoves(), board)
+	//moves := filterCaptures(, board)
 	var score int = 0
-	for _, move := range moves {
+	for len(moveList) > 0 {
+		var val int = -1
+		var move chess.Move
+		var idx int = 0
+		var ln int = len(moveList)
+		for i := 0; i < ln; i++ {
+			var newVal int = moveOrdering.GetMVV_LVA(moveList[i], board)
+			if newVal > val {
+				val = newVal
+				idx = i
+			}
+		}
+		move = moveList[idx]
+		moveList = append(moveList[:idx], moveList[idx+1:]...)
 		if isTimeToStop() {
 			return 0
 		}
@@ -267,28 +281,13 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 	return alpha
 }
 
-func filterCaptures(moves []chess.Move, board *chess.Board) []chess.Move {
+func captures(moves []chess.Move, board *chess.Board) []chess.Move {
 	var captures []chess.Move
 	for _, move := range moves {
 		if chess.IsCapture(move, board) {
 			captures = append(captures, move)
 		}
 	}
-	var n = len(captures)
-	for i := 0; i < n; i++ {
-		var minIdx = i
-		for j := i; j < n; j++ {
-			if moveOrdering.GetMVV_LVA(captures[j], board) > moveOrdering.GetMVV_LVA(captures[minIdx], board) {
-				minIdx = j
-			}
-		}
-		captures[i], captures[minIdx] = captures[minIdx], captures[i]
-	}
-	/*sort.Slice(filteredCaptures, func(a, b int) bool {
-		valueA := moveOrdering.GetMVV_LVA(filteredCaptures[a], board)
-		valueB := moveOrdering.GetMVV_LVA(filteredCaptures[b], board)
-		return valueA > valueB
-	})*/
 	return captures
 }
 
