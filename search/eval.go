@@ -252,7 +252,6 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 	var score int = 0
 	for len(moveList) > 0 {
 		var val int = -1
-		var move chess.Move
 		var idx int = 0
 		var ln int = len(moveList)
 		for i := 0; i < ln; i++ {
@@ -262,7 +261,7 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 				idx = i
 			}
 		}
-		move = moveList[idx]
+		var move chess.Move = moveList[idx]
 		moveList = append(moveList[:idx], moveList[idx+1:]...)
 		if isTimeToStop() {
 			return 0
