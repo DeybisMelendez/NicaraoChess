@@ -39,6 +39,9 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	}
 
 	var inCheck bool = board.OurKingInCheck()
+	if inCheck {
+		depth++
+	}
 	if nullMove && !inCheck {
 		if Ply > 0 && depth > NullDepth && !isEndgame(board) {
 			var staticEval int = Evaluate(board, turn)
