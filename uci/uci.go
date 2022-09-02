@@ -3,7 +3,7 @@ package uci
 import (
 	"bufio"
 	"fmt"
-	"nicarao/search"
+	"nicarao/engine"
 	"os"
 	"strconv"
 	"strings"
@@ -19,9 +19,9 @@ var on bool = true
 var inputReader *bufio.Reader = bufio.NewReader(os.Stdin)
 
 func Init() {
-	search.PST = search.PstMake()
-	search.InitHasTable()
-	search.InitEvaluationMask()
+	engine.PST = engine.PstMake()
+	engine.InitHasTable()
+	engine.InitEvaluationMask()
 }
 func UCI() {
 	command, _ := inputReader.ReadString('\n')
@@ -41,7 +41,7 @@ func UCI() {
 	} else if strings.Contains(command, "setoption name Hash value") {
 		slice := strings.Fields(command)
 		mb, _ := strconv.Atoi(slice[len(slice)-1])
-		search.SetHashTable(uint64(mb))
+		engine.SetHashTable(uint64(mb))
 
 	}
 	if on {
@@ -61,7 +61,7 @@ func isReady() {
 }
 
 func uciNewGame() {
-	search.ClearSearch()
+	engine.ClearSearch()
 	board = chess.ParseFen(startpos)
 }
 
@@ -70,7 +70,7 @@ func position(command string) {
 	if commands[1] == "startpos" {
 		uciNewGame()
 	} else if commands[1] == "fen" {
-		search.ClearSearch()
+		engine.ClearSearch()
 		board = chess.ParseFen(strings.Split(command, "position fen ")[1])
 	}
 	if strings.Contains(command, "moves ") {
@@ -83,8 +83,8 @@ func position(command string) {
 					fmt.Println(err)
 				}
 				_ = board.Apply(move)
-				search.GamePly++
-				search.RepetitionTable[search.GamePly] = board.Hash()
+				engine.GamePly++
+				engine.RepetitionTable[engine.GamePly] = board.Hash()
 			}
 		}
 	}
@@ -155,6 +155,6 @@ func goCommand(command string) {
 			"Start:", start,
 			"Stop:", stopTime,
 			"Depth:", depth)
-		go search.Search(&board, stopTime, depth)
+		engine.Search(&board, stopTime, depth)
 	}
 }

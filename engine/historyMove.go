@@ -1,4 +1,4 @@
-package moveOrdering
+package engine
 
 import (
 	chess "github.com/dylhunn/dragontoothmg"

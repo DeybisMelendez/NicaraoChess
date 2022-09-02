@@ -1,4 +1,4 @@
-package search
+package engine
 
 var PST = [2][7][64]int{} //[phase][piece][square]
 

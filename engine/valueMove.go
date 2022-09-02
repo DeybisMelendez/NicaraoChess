@@ -1,4 +1,4 @@
-package moveOrdering
+package engine
 
 import (
 	"nicarao/utils"
@@ -9,8 +9,8 @@ import (
 // var FollowPV bool
 var Material = [7]int{0, 1, 3, 3, 5, 9, 10}
 
-func ValueMove(board *chess.Board, move chess.Move, isCapture bool, isPromo bool, pvMove chess.Move, bestmove chess.Move, ply int, followPV bool) int {
-	if move == pvMove && followPV {
+func ValueMove(board *chess.Board, move chess.Move, isCapture bool, isPromo bool, pvMove chess.Move, bestmove chess.Move) int {
+	if move == pvMove && FollowPV {
 		return 20000
 	} else if move == bestmove {
 		return 19000
@@ -28,9 +28,9 @@ func ValueMove(board *chess.Board, move chess.Move, isCapture bool, isPromo bool
 			return 3000
 		}*/
 		return GetMVV_LVA(move, board)
-	} else if KillerMoves[0][ply] == move {
+	} else if KillerMoves[0][Ply] == move {
 		return 2000 + GetHistoryMove(board.Wtomove, move)
-	} else if KillerMoves[1][ply] == move {
+	} else if KillerMoves[1][Ply] == move {
 		return 1000 + GetHistoryMove(board.Wtomove, move)
 	} else {
 		return GetHistoryMove(board.Wtomove, move)

@@ -1,4 +1,4 @@
-package search
+package engine
 
 /*
 func ZWSearch(board *chess.Board, depth int, beta int, turn int, nullMove bool) int {

@@ -1,8 +1,7 @@
-package search
+package engine
 
 import (
 	"math/bits"
-	"nicarao/moveOrdering"
 	"nicarao/utils"
 
 	chess "github.com/dylhunn/dragontoothmg"
@@ -215,7 +214,7 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		var idx int = 0
 		var ln int = len(moveList)
 		for i := 0; i < ln; i++ {
-			var newVal int = moveOrdering.GetMVV_LVA(moveList[i], board)
+			var newVal int = GetMVV_LVA(moveList[i], board)
 			if newVal > val {
 				val = newVal
 				idx = i

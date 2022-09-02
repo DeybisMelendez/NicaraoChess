@@ -1,8 +1,7 @@
-package search
+package engine
 
 import (
 	"fmt"
-	"nicarao/moveOrdering"
 	"time"
 
 	chess "github.com/dylhunn/dragontoothmg"
@@ -83,8 +82,8 @@ func ClearSearch() {
 	InitHasTable()
 	ResetPVTable()
 	ResetGlobalVariables()
-	moveOrdering.ResetKillerMoves()
-	moveOrdering.ResetHistoryMove()
+	ResetKillerMoves()
+	ResetHistoryMove()
 	var newRep = [1000]uint64{}
 	RepetitionTable = newRep
 	GamePly = 0

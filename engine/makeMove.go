@@ -1,4 +1,4 @@
-package search
+package engine
 
 import (
 	chess "github.com/dylhunn/dragontoothmg"
