@@ -4,8 +4,8 @@ import chess "github.com/dylhunn/dragontoothmg"
 
 var KillerMoves [2][64]chess.Move
 
-func StoreKillerMove(move chess.Move, board *chess.Board, ply int) {
-	if ply < 64 && !chess.IsCapture(move, board) {
+func StoreKillerMove(move chess.Move, ply int) {
+	if ply < 64 {
 		KillerMoves[1][ply] = KillerMoves[0][ply]
 		KillerMoves[0][ply] = move
 	}

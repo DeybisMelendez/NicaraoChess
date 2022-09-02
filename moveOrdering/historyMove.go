@@ -6,14 +6,12 @@ import (
 
 var historyMoves [2][64][64]int
 
-func StoreHistoryMove(move chess.Move, board *chess.Board, depth int) {
-	if !chess.IsCapture(move, board) {
-		//piece, _ := utils.GetPiece(move.To(), board)
-		if board.Wtomove {
-			historyMoves[0][move.From()][move.To()] += depth * depth
-		} else {
-			historyMoves[1][move.From()][move.To()] += depth * depth
-		}
+func StoreHistoryMove(move chess.Move, Wtomove bool, depth int) {
+	//piece, _ := utils.GetPiece(move.To(), board)
+	if Wtomove {
+		historyMoves[0][move.From()][move.To()] += depth * depth
+	} else {
+		historyMoves[1][move.From()][move.To()] += depth * depth
 	}
 }
 

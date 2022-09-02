@@ -177,51 +177,10 @@ func Evaluate(board *chess.Board, turn int) int {
 	endgame += AttackedKing(incheck, board.Wtomove, false)
 
 	//Pawn structure
-	/*opening += bits.OnesCount64(board.White.Pawns&Center) * 20
+	opening += bits.OnesCount64(board.White.Pawns&Center) * 20
 	opening -= bits.OnesCount64(board.Black.Pawns&Center) * 20
 	opening += bits.OnesCount64(board.White.Pawns&ExtendedCenter) * 10
-	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10*/
-	/*for square := uint8(bits.TrailingZeros64(allPieces)); square < 64-uint8(bits.LeadingZeros64(allPieces)); square++ {
-		if (uint64(1)<<square)&allPieces != 0 {
-			piece, isWhite := utils.GetPiece(square, board)
-			//Material & PST Evaluation
-			var b *chess.Bitboards
-			var color int = 1
-			if isWhite {
-				b = &board.White
-				opening += MaterialScore[OPENING][piece]
-				endgame += MaterialScore[ENDGAME][piece]
-				opening += PST[OPENING][piece][ReversedBoard[square]]
-				endgame += PST[ENDGAME][piece][ReversedBoard[square]]
-			} else {
-				color = -1
-				b = &board.Black
-				opening -= MaterialScore[OPENING][piece]
-				endgame -= MaterialScore[ENDGAME][piece]
-				opening -= PST[OPENING][piece][square]
-				endgame -= PST[ENDGAME][piece][square]
-			}
-			switch piece {
-			case chess.Pawn:
-				val := DoublePawns(b.Pawns, square)
-				val += IsolatedPawns(b.Pawns, square)
-				opening -= val * color
-				endgame -= val * color
-			case chess.Knight:
-				mobility := MobilityKnight(square, allPieces)
-				opening += mobility * color
-				endgame += mobility * color
-			case chess.Bishop:
-				mobility := MobilityBishop(square, allPieces, b.All)
-				opening += mobility * color
-				endgame += mobility * color
-			case chess.Rook:
-				mobility := MobilityRook(square, allPieces, b.All)
-				opening += mobility * color
-				endgame += mobility * color
-			}
-		}
-	}*/
+	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10
 	if isEndgame(board) {
 		if IsDraw(board) {
 			return 0
