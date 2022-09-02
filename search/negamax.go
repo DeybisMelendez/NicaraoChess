@@ -149,7 +149,7 @@ func isTimeToStop() bool {
 	if Stopped {
 		return true
 	}
-	if StopTime != -1 {
+	if StopTime != -1 && Nodes&2047 == 0 {
 		if time.Now().UnixMilli() >= StopTime {
 			Stopped = true
 			return true
