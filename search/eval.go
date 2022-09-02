@@ -194,6 +194,7 @@ func Evaluate(board *chess.Board, turn int) int {
 }
 
 func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
+	PVLength[Ply] = Ply
 	if isTimeToStop() {
 		return 0
 	}
@@ -207,7 +208,7 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 	}*/
 	alpha = utils.Max(alpha, standPat)
 	moveList := captures(board.GenerateLegalMoves(), board)
-	//moves := filterCaptures(, board)
+	checkPV(moveList)
 	var score int = 0
 	for len(moveList) > 0 {
 		var val int = -1
@@ -239,9 +240,9 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 	return alpha
 }
 
-func captures(moves []chess.Move, board *chess.Board) []chess.Move {
+func captures(moveList []chess.Move, board *chess.Board) []chess.Move {
 	var captures []chess.Move
-	for _, move := range moves {
+	for _, move := range moveList {
 		if chess.IsCapture(move, board) {
 			captures = append(captures, move)
 		}

@@ -6,6 +6,8 @@ import (
 
 var PVLength [64]int
 var PVTable [64][64]chess.Move
+var FollowPV bool
+var ScorePV bool
 
 func StorePV(move chess.Move) {
 	// Triangular PV Table

@@ -2,7 +2,6 @@ package search
 
 import (
 	"nicarao/moveOrdering"
-	"strings"
 	"time"
 
 	chess "github.com/dylhunn/dragontoothmg"
@@ -42,7 +41,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if inCheck {
 		depth++
 	}
-	if nullMove && !inCheck {
+	/*if nullMove && !inCheck {
 		if Ply > 0 && depth > NullDepth && !isEndgame(board) {
 			var staticEval int = Evaluate(board, turn)
 			if staticEval >= beta {
@@ -61,8 +60,9 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 				}
 			}
 		}
-	}
+	}*/
 	moveList := board.GenerateLegalMoves()
+	checkPV(moveList)
 	var movesSearched int = 0
 	var lenMoveList int = len(moveList)
 	for len(moveList) > 0 {
@@ -70,7 +70,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		var idx int = 0
 		var ln int = len(moveList)
 		for i := 0; i < ln; i++ {
-			var newVal int = moveOrdering.ValueMove(board, moveList[i], PVTable[Ply][Ply], bestmove, Ply)
+			var newVal int = moveOrdering.ValueMove(board, moveList[i], PVTable[Ply][Ply], bestmove, Ply, FollowPV)
 			if newVal > val {
 				val = newVal
 				idx = i
@@ -149,7 +149,7 @@ func isTimeToStop() bool {
 	if Stopped {
 		return true
 	}
-	if StopTime != -1 && Nodes&2047 == 0 {
+	if StopTime != -1 && Nodes&16383 == 0 {
 		if time.Now().UnixMilli() >= StopTime {
 			Stopped = true
 			return true
@@ -163,4 +163,14 @@ func ResetGlobalVariables() {
 	Stopped = false
 	/*var newRep = [150]uint64{}
 	RepetitionTable = newRep*/
+}
+
+func checkPV(moveList []chess.Move) {
+	for _, move := range moveList {
+		FollowPV = false
+		if move == PVTable[0][Ply] {
+			FollowPV = true
+			break
+		}
+	}
 }

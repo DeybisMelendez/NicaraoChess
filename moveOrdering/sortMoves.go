@@ -9,8 +9,8 @@ import (
 // var FollowPV bool
 var Material = [7]int{0, 1, 3, 3, 5, 9, 10}
 
-func ValueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, ply int) int {
-	if move == pvMove {
+func ValueMove(board *chess.Board, move chess.Move, pvMove chess.Move, bestmove chess.Move, ply int, followPV bool) int {
+	if move == pvMove && followPV {
 		return 6000
 	} else if move == bestmove {
 		return 5000

@@ -25,6 +25,8 @@ var lastBestmove chess.Move
 
 func Search(board *chess.Board, stopTime int64, depth int) {
 	starting := time.Now().UnixMilli()
+	FollowPV = false
+	ScorePV = false
 	score := 0
 	Nodes = 0
 	scoreType := "cp"
@@ -42,7 +44,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 		if depth == 0 {
 			break
 		}
-		//moveOrdering.FollowPV = true
+		FollowPV = true
 		score = Negamax(board, currDepth, alpha, beta, turn, DoNull)
 		if isTimeToStop() {
 			break
