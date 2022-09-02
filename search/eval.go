@@ -160,27 +160,27 @@ func Evaluate(board *chess.Board, turn int) int {
 		endgame -= PST[ENDGAME][chess.Queen][square]
 		pieces &= pieces - 1
 	}
-	incheck := board.OurKingInCheck()
+	//incheck := board.OurKingInCheck()
 	king := uint8(bits.TrailingZeros64(board.White.Kings))
 	opening += PST[OPENING][chess.King][ReversedBoard[king]]
 	endgame += PST[ENDGAME][chess.King][ReversedBoard[king]]
-	opening -= BadKing(king, allPieces, board.White.All, false)
+	/*opening -= BadKing(king, allPieces, board.White.All, false)
 	opening -= AttackedKing(incheck, board.Wtomove, true)
 	endgame -= BadKing(king, allPieces, board.White.All, true)
-	endgame -= AttackedKing(incheck, board.Wtomove, false)
+	endgame -= AttackedKing(incheck, board.Wtomove, false)*/
 	king = uint8(bits.TrailingZeros64(board.Black.Kings))
 	opening -= PST[OPENING][chess.King][king]
 	endgame -= PST[ENDGAME][chess.King][king]
-	opening += BadKing(king, allPieces, board.Black.All, false)
+	/*opening += BadKing(king, allPieces, board.Black.All, false)
 	opening += AttackedKing(incheck, board.Wtomove, true)
 	endgame += BadKing(king, allPieces, board.Black.All, true)
-	endgame += AttackedKing(incheck, board.Wtomove, false)
+	endgame += AttackedKing(incheck, board.Wtomove, false)*/
 
 	//Pawn structure
-	opening += bits.OnesCount64(board.White.Pawns&Center) * 20
+	/*opening += bits.OnesCount64(board.White.Pawns&Center) * 20
 	opening -= bits.OnesCount64(board.Black.Pawns&Center) * 20
 	opening += bits.OnesCount64(board.White.Pawns&ExtendedCenter) * 10
-	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10
+	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10*/
 	if isEndgame(board) {
 		if IsDraw(board) {
 			return 0

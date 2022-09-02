@@ -21,14 +21,17 @@ func ValueMove(board *chess.Board, move chess.Move, isCapture bool, isPromo bool
 		if Material[capture] > Material[piece] {
 			return 18000 + Material[capture] - Material[piece] + Material[promo]
 		}
-		if capture == piece {
-			return 17000
+		if isPromo {
+			return 17000 + Material[promo]
 		}
+		/*if capture == piece {
+			return 3000
+		}*/
 		return GetMVV_LVA(move, board)
 	} else if KillerMoves[0][ply] == move {
-		return 2000
+		return 2000 + GetHistoryMove(board.Wtomove, move)
 	} else if KillerMoves[1][ply] == move {
-		return 1000
+		return 1000 + GetHistoryMove(board.Wtomove, move)
 	} else {
 		return GetHistoryMove(board.Wtomove, move)
 	}

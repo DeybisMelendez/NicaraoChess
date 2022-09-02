@@ -9,8 +9,8 @@ import (
 )
 
 const Infinity = 10000
-const MateValue = 8000
-const MateScore = 7500
+const MateValue = 9900
+const MateScore = 9800
 const DoNull = true
 const NoNull = false
 const NullDepth = 2
@@ -22,7 +22,7 @@ var StopTime int64 = -1
 var Stopped bool = false
 
 func Search(board *chess.Board, stopTime int64, depth int) {
-	starting := time.Now().UnixMilli()
+	start := time.Now().UnixMilli()
 	var bestmove chess.Move
 	var lastBestmove chess.Move
 	FollowPV = false
@@ -53,14 +53,14 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			score = (MateValue - score + 1) / 2
 			scoreType = "mate"
 		} else if score <= -MateScore {
-			score = (MateValue + score) / 2
+			score = -(MateValue + score) / 2
 			scoreType = "mate"
 		}
 		fmt.Println("info",
 			"depth", currDepth,
 			"score", scoreType, score,
 			"nodes", Nodes,
-			"time", time.Now().UnixMilli()-starting,
+			"time", time.Now().UnixMilli()-start,
 			"pv", FormatPV(PVTable[0]))
 		/*if scoreType == "mate" {
 			break

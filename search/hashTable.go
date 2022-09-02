@@ -57,10 +57,10 @@ func ReadHashEntry(hash uint64, alpha int, beta int, depth int, move *chess.Move
 			if entry.flag == HashFlagExact {
 				return score
 			}
-			if entry.flag == HashFlagAlpha && score <= alpha {
+			if (entry.flag == HashFlagAlpha) && (score <= alpha) {
 				return alpha
 			}
-			if entry.flag == HashFlagBeta && score >= beta {
+			if (entry.flag == HashFlagBeta) && (score >= beta) {
 				return beta
 			}
 			*move = entry.bestmove

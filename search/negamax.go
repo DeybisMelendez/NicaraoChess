@@ -9,13 +9,12 @@ import (
 
 func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullMove bool) int {
 	PVLength[Ply] = Ply
-	var score int = 0
 	var hashFlag int = HashFlagAlpha
-	var bestmove chess.Move
+	var hashmove chess.Move
 	var isPVNode bool = beta-alpha > 1
-	var hashScore int = ReadHashEntry(board.Hash(), alpha, beta, depth, &bestmove)
-	if hashScore != NoHashEntry && Ply > 0 && !isPVNode {
-		return hashScore
+	var score int = ReadHashEntry(board.Hash(), alpha, beta, depth, &hashmove)
+	if score != NoHashEntry && !isPVNode && Ply > 0 {
+		return score
 	}
 	if isTimeToStop() {
 		return 0
@@ -41,18 +40,27 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if inCheck {
 		depth++
 	}
-	if nullMove && !inCheck {
-		if Ply > 0 && depth > NullDepth && !isEndgame(board) {
+	if nullMove && !inCheck && depth > 2 {
+		//Null Move Reduction
+		if Ply > 0 { // && !isEndgame(board) {
 			var staticEval int = Evaluate(board, turn)
 			if staticEval >= beta {
 				board.Wtomove = !board.Wtomove
 				nullBoard := chess.ParseFen(board.ToFen())
 				board.Wtomove = !board.Wtomove
-				if !nullBoard.OurKingInCheck() && len(nullBoard.GenerateLegalMoves()) != 0 {
-					eval := -Negamax(&nullBoard, depth-NullDepth-1, -beta, -beta+1, -turn, NoNull)
+				if len(nullBoard.GenerateLegalMoves()) != 0 {
+					var R int = 2
+					if depth > 6 {
+						R = 3
+					}
+					eval := -Negamax(&nullBoard, depth-R-1, -beta, -beta+1, -turn, NoNull)
 					//eval := -ZWSearch(&nullBoard, depth-NullDepth-1, -beta, -turn, NoNull)
 					if eval >= beta {
-						return eval
+						depth -= R
+						//return eval
+					}
+					if depth <= 0 {
+						return Evaluate(board, turn)
 					}
 				}
 			}
@@ -71,7 +79,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		for i := 0; i < ln; i++ {
 			isCapture = chess.IsCapture(moveList[i], board)
 			isPromotion = moveList[i].Promote() != chess.Nothing
-			var newVal int = moveOrdering.ValueMove(board, moveList[i], isCapture, isPromotion, PVTable[Ply][Ply], bestmove, Ply, FollowPV)
+			var newVal int = moveOrdering.ValueMove(board, moveList[i], isCapture, isPromotion, PVTable[Ply][Ply], hashmove, Ply, FollowPV)
 			if newVal > val {
 				val = newVal
 				idx = i
@@ -95,7 +103,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		if movesSearched == 0 {
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
-			if movesSearched > 3 && !isTactical && depth > 2 {
+			if movesSearched > 2 && !isTactical && depth > 2 {
 				//score = -ZWSearch(board, depth-2, -alpha, -turn, nullMove)
 				score = -Negamax(board, depth-2, -alpha-1, -alpha, -turn, DoNull)
 			} else {
@@ -116,7 +124,6 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		movesSearched++
 		if score > alpha {
 			StorePV(move)
-			bestmove = move
 			hashFlag = HashFlagExact
 			alpha = score
 			if score >= beta {
@@ -141,7 +148,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		}
 	}
 
-	WriteHashEntry(board.Hash(), beta, depth, hashFlag, bestmove)
+	WriteHashEntry(board.Hash(), beta, depth, hashFlag, hashmove)
 	return alpha
 }
 
@@ -166,11 +173,13 @@ func ResetGlobalVariables() {
 }
 
 func checkPV(moveList []chess.Move) {
-	for _, move := range moveList {
-		FollowPV = false
-		if move == PVTable[0][Ply] {
-			FollowPV = true
-			break
+	if FollowPV {
+		for _, move := range moveList {
+			FollowPV = false
+			if move == PVTable[Ply][Ply] {
+				FollowPV = true
+				break
+			}
 		}
 	}
 }
