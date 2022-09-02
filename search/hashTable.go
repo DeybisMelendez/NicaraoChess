@@ -55,7 +55,7 @@ func ReadHashEntry(hash uint64, alpha int, beta int, depth int, move *chess.Move
 				score -= Ply
 			}
 			if entry.flag == HashFlagExact {
-				return entry.score
+				return score
 			}
 			if entry.flag == HashFlagAlpha && score <= alpha {
 				return alpha
@@ -63,8 +63,8 @@ func ReadHashEntry(hash uint64, alpha int, beta int, depth int, move *chess.Move
 			if entry.flag == HashFlagBeta && score >= beta {
 				return beta
 			}
+			*move = entry.bestmove
 		}
-		*move = entry.bestmove
 	}
 	return NoHashEntry
 }

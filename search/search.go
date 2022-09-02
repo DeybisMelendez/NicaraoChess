@@ -20,11 +20,11 @@ var Ply int = 0
 var Nodes int = 0
 var StopTime int64 = -1
 var Stopped bool = false
-var bestmove chess.Move
-var lastBestmove chess.Move
 
 func Search(board *chess.Board, stopTime int64, depth int) {
 	starting := time.Now().UnixMilli()
+	var bestmove chess.Move
+	var lastBestmove chess.Move
 	FollowPV = false
 	ScorePV = false
 	score := 0
