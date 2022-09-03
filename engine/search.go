@@ -79,7 +79,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 }
 
 func ClearSearch() {
-	InitHasTable()
+	//InitHasTable()
 	ResetPVTable()
 	ResetGlobalVariables()
 	ResetKillerMoves()
