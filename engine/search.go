@@ -10,8 +10,8 @@ import (
 const Infinity = 10000
 const MateValue = 9900
 const MateScore = 9800
-const DoNull = true
-const NoNull = false
+const DoNull bool = true
+const NoNull bool = false
 const NullDepth = 2
 
 var GamePly int = 0

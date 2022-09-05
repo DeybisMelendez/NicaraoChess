@@ -7,6 +7,7 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
+var Material = [7]int{0, 1, 3, 3, 5, 9, 10}
 var MaterialOpening = [7]int{0, 90, 320, 330, 500, 900, 10000}
 var MaterialEndgame = [7]int{0, 100, 320, 350, 550, 900, 10000}
 var MaterialScore = [2][7]int{MaterialOpening, MaterialEndgame} //Opening, Endgame

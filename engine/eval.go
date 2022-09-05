@@ -2,7 +2,6 @@ package engine
 
 import (
 	"math/bits"
-	"nicarao/utils"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
@@ -190,67 +189,6 @@ func Evaluate(board *chess.Board, turn int) int {
 	phase = ((phase * 256) + (TotalPhase / 2)) / TotalPhase
 	score := ((opening * (256 - phase)) + (opening * phase)) / 256
 	return score * turn
-}
-
-func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
-	PVLength[Ply] = Ply
-	if isTimeToStop() {
-		return 0
-	}
-	/*if Ply >= 64 {
-		return Evaluate(board, turn)
-	}*/
-	standPat := Evaluate(board, turn)
-	if standPat > beta {
-		return beta
-	}
-	// Delta pruning
-	/*if standPat < alpha-Delta {
-		return alpha
-	}*/
-	alpha = utils.Max(alpha, standPat)
-	moveList := captures(board.GenerateLegalMoves(), board)
-	checkPV(moveList)
-	var score int = 0
-	for len(moveList) > 0 {
-		var val int = -1
-		var idx int = 0
-		var ln int = len(moveList)
-		for i := 0; i < ln; i++ {
-			//var newVal int = ValueMove(board, moveList[i], true, moveList[i].Promote() != chess.Nothing, PVTable[Ply][Ply], 0)
-			var newVal int = GetMVV_LVA(moveList[i], board) // + MaterialOpening[moveList[i].Promote()]
-			if moveList[i] == PVTable[0][Ply] && FollowPV {
-				newVal = 10000
-			}
-			if newVal > val {
-				val = newVal
-				idx = i
-			}
-		}
-		var move chess.Move = moveList[idx]
-		moveList = append(moveList[:idx], moveList[idx+1:]...)
-		unmakeFunc := Make(board, move)
-		score = -Quiesce(board, -beta, -alpha, -turn)
-		Unmake(unmakeFunc)
-		if score > alpha {
-			StorePV(move)
-			alpha = score
-		}
-		if score >= beta {
-			return beta
-		}
-	}
-	return alpha
-}
-
-func captures(moveList []chess.Move, board *chess.Board) []chess.Move {
-	var captures []chess.Move
-	for _, move := range moveList {
-		if chess.IsCapture(move, board) {
-			captures = append(captures, move)
-		}
-	}
-	return captures
 }
 
 /*func getMinorPieces(board *chess.Board) int {

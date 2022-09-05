@@ -12,7 +12,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	var hashmove chess.Move
 	var isPVNode bool = beta-alpha > 1
 	var score int = ReadHashEntry(board.Hash(), alpha, beta, depth, &hashmove)
-	if score != NoHashEntry && !isPVNode && Ply > 0 {
+	if score != NoHashEntry && !isPVNode && Ply > 0 && !nullMove {
 		return score
 	}
 	if isTimeToStop() {
@@ -36,30 +36,30 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	}
 
 	var inCheck bool = board.OurKingInCheck()
-	if nullMove && !inCheck && depth > 2 {
+	if nullMove && !inCheck && depth > 4 {
 		//Null Move Reduction
 		if Ply > 0 { // && !isEndgame(board) {
-			var staticEval int = Evaluate(board, turn)
-			if staticEval >= beta {
-				board.Wtomove = !board.Wtomove
-				nullBoard := chess.ParseFen(board.ToFen())
-				board.Wtomove = !board.Wtomove
-				if len(nullBoard.GenerateLegalMoves()) != 0 {
-					var R int = 2
-					if depth > 6 {
-						R = 3
-					}
-					eval := -Negamax(&nullBoard, depth-R-1, -beta, -beta+1, -turn, NoNull)
-					//eval := -ZWSearch(&nullBoard, depth-NullDepth-1, -beta, -turn, NoNull)
-					if eval >= beta {
-						depth -= R
-						//return eval
-					}
-					if depth <= 0 {
-						return Quiesce(board, alpha, beta, turn)
-					}
+			//var staticEval int = Evaluate(board, turn)
+			//if staticEval >= beta {
+			board.Wtomove = !board.Wtomove
+			nullBoard := chess.ParseFen(board.ToFen())
+			board.Wtomove = !board.Wtomove
+			if len(nullBoard.GenerateLegalMoves()) != 0 {
+				var R int = depth / 3
+				/*if depth > 6 {
+					R = 3
+				}*/
+				eval := -Negamax(&nullBoard, depth-R-1, -beta, 1-beta, -turn, NoNull)
+				//eval := -ZWSearch(&nullBoard, depth-NullDepth-1, -beta, -turn, NoNull)
+				if eval >= beta {
+					depth -= 4
+					//return eval
 				}
+				/*if depth <= 0 {
+					return Quiesce(board, alpha, beta, turn)
+				}*/
 			}
+			//}
 		}
 	}
 	moveList := board.GenerateLegalMoves()
@@ -89,7 +89,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		var move = moveList[idx]
 		moveList = append(moveList[:idx], moveList[idx+1:]...)
 		unmakeFunc := Make(board, move)
-		if !isTactical && depth < 3 && depth > 0 {
+		/*if !isTactical && depth < 3 && depth > 0 {
 			var staticEval int = Evaluate(board, turn)
 			// Razoring
 			if depth == 2 && staticEval+50 < alpha {
@@ -99,7 +99,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 				Unmake(unmakeFunc)
 				continue
 			}
-		}
+		}*/
 		if movesSearched == 0 {
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
@@ -126,12 +126,17 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			StorePV(move)
 			hashFlag = HashFlagExact
 			alpha = score
+			if depth > 8 {
+				depth--
+			}
 			if score >= beta {
 				if !isCapture {
 					StoreKillerMove(move)
 					StoreHistoryMove(move, board.Wtomove, depth)
 				}
-				WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta, move)
+				if !nullMove {
+					WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta, move)
+				}
 				return beta
 			}
 		}
@@ -147,8 +152,9 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			return 0
 		}
 	}
-
-	WriteHashEntry(board.Hash(), beta, depth, hashFlag, hashmove)
+	if !nullMove {
+		WriteHashEntry(board.Hash(), beta, depth, hashFlag, hashmove)
+	}
 	return alpha
 }
 

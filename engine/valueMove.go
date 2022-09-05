@@ -7,7 +7,6 @@ import (
 )
 
 // var FollowPV bool
-var Material = [7]int{0, 1, 3, 3, 5, 9, 10}
 
 func ValueMove(board *chess.Board, move chess.Move, isCapture bool, isPromo bool, pvMove chess.Move, bestmove chess.Move) int {
 	if move == pvMove && FollowPV {
