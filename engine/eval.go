@@ -20,9 +20,6 @@ var TotalPhase int = KnightPhase*4 +
 var phase int = TotalPhase
 
 func Evaluate(board *chess.Board, turn int) int {
-	if IsDraw(board) {
-		return 0
-	}
 	opening, endgame := 0, 0
 	allPieces := board.White.All | board.Black.All
 	allPawnCount := bits.OnesCount64(board.White.Pawns | board.Black.Pawns)
@@ -184,6 +181,9 @@ func Evaluate(board *chess.Board, turn int) int {
 	opening += bits.OnesCount64(board.White.Pawns&ExtendedCenter) * 10
 	opening -= bits.OnesCount64(board.Black.Pawns&ExtendedCenter) * 10*/
 	if isEndgame(board) {
+		if IsDraw(board) {
+			return 0
+		}
 		return endgame * turn // Endgame
 	}
 	//opening += Mobility(board)
@@ -197,9 +197,9 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 	if isTimeToStop() {
 		return 0
 	}
-	if Ply >= 64 {
+	/*if Ply >= 64 {
 		return Evaluate(board, turn)
-	}
+	}*/
 	standPat := Evaluate(board, turn)
 	if standPat > beta {
 		return beta
@@ -218,8 +218,8 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		var ln int = len(moveList)
 		for i := 0; i < ln; i++ {
 			//var newVal int = ValueMove(board, moveList[i], true, moveList[i].Promote() != chess.Nothing, PVTable[Ply][Ply], 0)
-			var newVal int = GetMVV_LVA(moveList[i], board) + MaterialOpening[moveList[i].Promote()]
-			if moveList[i] == PVTable[Ply][Ply] && FollowPV {
+			var newVal int = GetMVV_LVA(moveList[i], board) // + MaterialOpening[moveList[i].Promote()]
+			if moveList[i] == PVTable[0][Ply] && FollowPV {
 				newVal = 10000
 			}
 			if newVal > val {
@@ -229,9 +229,6 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		}
 		var move chess.Move = moveList[idx]
 		moveList = append(moveList[:idx], moveList[idx+1:]...)
-		if isTimeToStop() {
-			return 0
-		}
 		unmakeFunc := Make(board, move)
 		score = -Quiesce(board, -beta, -alpha, -turn)
 		Unmake(unmakeFunc)

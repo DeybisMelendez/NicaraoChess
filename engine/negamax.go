@@ -36,9 +36,6 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	}
 
 	var inCheck bool = board.OurKingInCheck()
-	if inCheck {
-		depth++
-	}
 	if nullMove && !inCheck && depth > 2 {
 		//Null Move Reduction
 		if Ply > 0 { // && !isEndgame(board) {
@@ -59,7 +56,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 						//return eval
 					}
 					if depth <= 0 {
-						return Evaluate(board, turn)
+						return Quiesce(board, alpha, beta, turn)
 					}
 				}
 			}
@@ -70,9 +67,9 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	var movesSearched int = 0
 	var lenMoveList int = len(moveList)
 	// One Reply Extension
-	/*if lenMoveList == 1 {
+	if lenMoveList == 1 || inCheck {
 		depth++
-	}*/
+	}
 	for len(moveList) > 0 {
 		var val int = -1
 		var idx int = 0
@@ -82,7 +79,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		for i := 0; i < ln; i++ {
 			isCapture = chess.IsCapture(moveList[i], board)
 			isPromotion = moveList[i].Promote() != chess.Nothing
-			var newVal int = ValueMove(board, moveList[i], isCapture, isPromotion, PVTable[Ply][Ply], hashmove)
+			var newVal int = ValueMove(board, moveList[i], isCapture, isPromotion, PVTable[0][Ply], hashmove)
 			if newVal > val {
 				val = newVal
 				idx = i
@@ -159,7 +156,7 @@ func isTimeToStop() bool {
 	if Stopped {
 		return true
 	}
-	if StopTime != -1 && Nodes&16383 == 0 {
+	if StopTime != -1 && Nodes&1023 == 0 {
 		if time.Now().UnixMilli() >= StopTime {
 			Stopped = true
 			return true
@@ -179,7 +176,7 @@ func checkPV(moveList []chess.Move) {
 	if FollowPV {
 		for _, move := range moveList {
 			FollowPV = false
-			if move == PVTable[Ply][Ply] {
+			if move == PVTable[0][Ply] {
 				FollowPV = true
 				break
 			}

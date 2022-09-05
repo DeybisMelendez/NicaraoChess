@@ -61,7 +61,7 @@ func isReady() {
 }
 
 func uciNewGame() {
-	engine.InitHasTable()
+	//engine.InitHasTable()
 	engine.ClearSearch()
 	board = chess.ParseFen(startpos)
 }
