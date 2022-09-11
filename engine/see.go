@@ -16,9 +16,9 @@ func SEE(board *chess.Board, move chess.Move, square uint8, value int, turn int)
 			if chess.IsCapture(next, board) {
 				bestvalue := SEE(board, next, square, value, -turn)
 				value = utils.Max(bestvalue, value)
-			} else {
+			} /* else {
 				break
-			}
+			}*/
 		}
 	}
 	Unmake(unmake)

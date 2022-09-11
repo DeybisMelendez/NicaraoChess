@@ -104,7 +104,7 @@ func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool) in
 	if isEndgame {
 		return 0
 	}
-	return score * score / 2
+	return score
 }
 
 func AttackedKing(incheck bool, isWhite bool, isOpening bool) int {

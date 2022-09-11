@@ -7,12 +7,13 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-const Infinity = 10000
-const MateValue = 9900
-const MateScore = 9800
+const Infinity = 100000
+const MateValue = 90000
+
 const DoNull bool = true
 const NoNull bool = false
-const NullDepth = 2
+
+//const NullDepth = 2
 
 var GamePly int = 0
 var Ply int = 0
@@ -24,10 +25,10 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	start := time.Now().UnixMilli()
 	var bestmove chess.Move
 	var lastBestmove chess.Move
-	FollowPV = false
-	ScorePV = false
-	score := 0
 	Nodes = 0
+	FollowPV = false
+	//ScorePV = false
+	score := 0
 	scoreType := "cp"
 	alpha := -Infinity
 	beta := Infinity
@@ -48,10 +49,10 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 		if isTimeToStop() {
 			break
 		}
-		if score >= MateScore {
+		if score >= MateValue-1000 {
 			score = (MateValue - score + 1) / 2
 			scoreType = "mate"
-		} else if score <= -MateScore {
+		} else if score <= -MateValue+1000 {
 			score = -(MateValue + score) / 2
 			scoreType = "mate"
 		}
@@ -60,13 +61,13 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			"score", scoreType, score,
 			"nodes", Nodes,
 			"time", time.Now().UnixMilli()-start,
-			"pv", FormatPV(PVTable[0]))
+			"pv", FormatPV())
 		/*if scoreType == "mate" {
 			break
 		}*/
-		ResetGlobalVariables()
 		depth--
 		currDepth++
+		//ResetGlobalVariables()
 	}
 	if Stopped {
 		bestmove = lastBestmove
@@ -79,7 +80,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 }
 
 func ClearSearch() {
-	InitHasTable()
+	//InitHasTable()
 	ResetPVTable()
 	ResetGlobalVariables()
 	ResetKillerMoves()
@@ -87,4 +88,8 @@ func ClearSearch() {
 	var newRep = [1000]uint64{}
 	RepetitionTable = newRep
 	GamePly = 0
+}
+func ResetGlobalVariables() {
+	Ply = 0
+	Stopped = false
 }

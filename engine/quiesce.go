@@ -7,13 +7,10 @@ import (
 )
 
 func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
-	PVLength[Ply] = Ply
 	if isTimeToStop() {
 		return 0
 	}
-	/*if Ply >= 64 {
-		return Evaluate(board, turn)
-	}*/
+	PVLength[Ply] = Ply
 	standPat := Evaluate(board, turn)
 	if standPat > beta {
 		return beta
@@ -23,21 +20,19 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		return alpha
 	}*/
 	alpha = utils.Max(alpha, standPat)
-	moveList := board.GenerateLegalMoves() //captures(board.GenerateLegalMoves(), board)
-	checkPV(moveList)
+	moveList := board.GenerateLegalMoves()
+	bestmove := checkPV(moveList)
 	var score int = 0
 	for {
 		var val int = -1
 		var idx int = -1
 		var ln int = len(moveList)
 		for i := 0; i < ln; i++ {
-			//var newVal int = ValueMove(board, moveList[i], true, moveList[i].Promote() != chess.Nothing, PVTable[Ply][Ply], 0)
-			// + MaterialOpening[moveList[i].Promote()]
+			if moveList[i] == bestmove && FollowPV {
+				idx = i
+				break
+			}
 			if chess.IsCapture(moveList[i], board) {
-				if moveList[i] == PVTable[0][Ply] && FollowPV {
-					idx = i
-					break
-				}
 				var newVal int = GetMVV_LVA(moveList[i], board)
 				if newVal > val {
 					val = newVal
@@ -57,23 +52,20 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 			if score > alpha {
 				StorePV(move)
 				alpha = score
+				if score >= beta {
+					return beta
+				}
 			}
-			if score >= beta {
-				return beta
+		} /* else {
+			i := -1
+			for i < len(moveList) {
+				i++
+				if moveList[i].To() == move.To() {
+					moveList = append(moveList[:i], moveList[i+1:]...)
+					i = -1
+				}
 			}
-		} else {
-			break
-		}
+		}*/
 	}
 	return alpha
 }
-
-/*func captures(moveList []chess.Move, board *chess.Board) []chess.Move {
-	var captures []chess.Move
-	for _, move := range moveList {
-		if chess.IsCapture(move, board) {
-			captures = append(captures, move)
-		}
-	}
-	return captures
-}*/

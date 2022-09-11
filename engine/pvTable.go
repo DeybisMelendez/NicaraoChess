@@ -7,7 +7,8 @@ import (
 var PVLength [64]int
 var PVTable [64][64]chess.Move
 var FollowPV bool
-var ScorePV bool
+
+//var ScorePV bool
 
 func StorePV(move chess.Move) {
 	// Triangular PV Table
@@ -28,12 +29,23 @@ func ResetPVTable() {
 	PVTable = newPVTable
 }
 
-func FormatPV(moves [64]chess.Move) string {
+func FormatPV() string {
 	str := ""
-	for i := 0; i < len(moves); i++ {
-		if moves[i] != 0 {
-			str += moves[i].String() + " "
-		}
+	for i := 0; i < PVLength[0]; i++ {
+		str += PVTable[0][i].String() + " "
 	}
 	return str
+}
+
+func checkPV(moveList []chess.Move) chess.Move {
+	if FollowPV {
+		FollowPV = false
+		for _, move := range moveList {
+			if move == PVTable[0][Ply] {
+				FollowPV = true
+				return move
+			}
+		}
+	}
+	return 0
 }
