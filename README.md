@@ -2,6 +2,8 @@
 
 Nicarao Chess is a basic chess engine written in Go by Deybis Melendez.
 
+[Lichess Account](https://lichess.org/@/Nicarao_Chess) (2100 elo blitz).
+
 ## Features
 
 ### Communication 
