@@ -1,5 +1,7 @@
 # NicaraoChess
 
+Nicarao Chess is a basic chess engine written in Go by Deybis Melendez.
+
 ## Features
 
 ### Communication 
@@ -22,14 +24,14 @@
     - Killer Heuristic
     - History Heuristic
     - MVV-LVA
+    - SEE
 
 - Selectivity:
     - Check Extension
-    - Null Move Reduction
-    - Razoring
     - Late Move Reduction (LMR)
     - Futility Pruning
     - Quiescence
+    - Mate Distance Pruning
 
 ### Evaluation
 
@@ -46,4 +48,3 @@
 - Mop-up Evaluation
 - Internal Iterative Deepening
 - Countermove Heuristic
-- Mate Distance Pruning

@@ -21,8 +21,8 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if IsRepetition(board.Hash()) {
 		return 0
 	}
-	if depth == 0 {
-		return Quiesce(board, alpha, beta, turn) //Evaluate(board,turn) //
+	if depth == 0 || Ply >= 64 {
+		return Quiesce(board, alpha, beta, turn)
 	}
 	// Mate Distance pruning
 	if alpha < -MateValue {
@@ -34,53 +34,13 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if alpha >= beta {
 		return alpha
 	}
-
 	var inCheck bool = board.OurKingInCheck()
-	/*R := 2
-	if nullMove && !inCheck && depth > R {
-		if !isEndgame(board) {
-			//var staticEval = Evaluate(board, turn)
-			//if staticEval >= beta {
-			//Null Move Reduction
-			board.Wtomove = !board.Wtomove
-			halfmoveclock := board.Halfmoveclock
-			board.Halfmoveclock = 0
-			nullBoard := chess.ParseFen(board.ToFen())
-			board.Wtomove = !board.Wtomove
-			board.Halfmoveclock = halfmoveclock
-			if len(nullBoard.GenerateLegalMoves()) != 0 {
-				//if depth-R-1 > 0 {
-				score = -Negamax(&nullBoard, depth-R-1, -beta, -beta+1, -turn, NoNull)
-				//} else {
-				//	score = Quiesce(board, -beta, -beta+1, -turn)
-				//}
-				//eval := -ZWSearch(&nullBoard, depth-NullDepth-1, -beta, -turn, NoNull)
-				if score >= beta {
-					return beta
-				}
-			}
-			//}
-		}
-	}*/
 	var moveList []chess.Move = board.GenerateLegalMoves()
 	var bestmove chess.Move = checkPV(moveList)
-	if hashmove == 0 && bestmove == 0 && isPVNode && nullMove && depth >= 6 && Ply > 1 {
-		Negamax(board, depth-2, alpha, beta, turn, DoNull)
-		/*if score > alpha {
-			if score < beta {
-
-			}
-		}*/
-	}
 	var movesSearched int = 0
 	var lenMoveList int = len(moveList)
-	/*var staticEval = Evaluate(board, turn)
-	// Razoring
-	if depth == 2 && staticEval+50 < alpha {
-		depth--
-	}*/
-	// One Reply & Check Extension
-	if lenMoveList == 1 || inCheck {
+	// Check Extension
+	if inCheck {
 		depth++
 	}
 	for len(moveList) > 0 {
@@ -122,14 +82,12 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		if movesSearched == 0 {
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
-			if movesSearched > 2 && !isTactical && !IsKillerMove(move) { // && GetHistoryMove(board.Wtomove, move) > depth*depth*10 {
-				//score = -ZWSearch(board, depth-2, -alpha, -turn, nullMove)
+			if movesSearched > 2 && !isTactical && !IsKillerMove(move) {
 				score = -Negamax(board, newDepth*2/3, -alpha-1, -alpha, -turn, DoNull)
 			} else {
 				score = alpha + 1
 			}
 			if score > alpha {
-				//score = -ZWSearch(board, depth-1, -alpha, -turn, nullMove)
 				score = -Negamax(board, newDepth-1, -alpha-1, -alpha, -turn, DoNull)
 				if score > alpha && score < beta {
 					score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)

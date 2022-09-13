@@ -2,7 +2,6 @@ package engine
 
 import (
 	"math/bits"
-	"nicarao/utils"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
@@ -28,22 +27,6 @@ func DoublePawns(pawns uint64, square uint8) int {
 func IsolatedPawns(pawns uint64, square uint8) int {
 	if pawns&IsolatedMask[square] == 0 {
 		return 10
-	}
-	return 0
-}
-
-// TODO problema con peon pasado, falla
-func PassedPawns(pawns uint64, square uint8, isWhite bool) int {
-	if isWhite {
-		utils.PrintBits(WhitePassedMask[ReversedBoard[square]])
-		if pawns&WhitePassedMask[square] == 0 {
-			return PassedPawnBonus[getRank[square]]
-		} else {
-			return 0
-		}
-	}
-	if pawns&BlackPassedMask[square] == 0 {
-		return PassedPawnBonus[getRank[square]]
 	}
 	return 0
 }
@@ -106,29 +89,3 @@ func BadKing(square uint8, allPieces uint64, myPieces uint64, isEndgame bool) in
 	}
 	return score
 }
-
-func AttackedKing(incheck bool, isWhite bool, isOpening bool) int {
-	score := 30
-	if isOpening {
-		score = 20
-	}
-	if incheck {
-		if isWhite {
-			return score
-		} else {
-			return -score
-		}
-	}
-	return 0
-}
-
-/*func CenterPawn(square uint8) int {
-	squareMask := uint64(1) << square
-	if Center&squareMask != 0 {
-		return 20
-	}
-	if ExtendedCenter&squareMask != 0 {
-		return 10
-	}
-	return 0
-}*/

@@ -139,16 +139,6 @@ func PstMake() [2][7][64]int {
 	opening := [7][64]int{nothing, PawnOG, KnightOG, BishopOG, RookOG, QueenOG, KingOG}
 
 	endgame := [7][64]int{nothing, PawnEG, KnightEG, BishopEG, RookEG, QueenEG, KingEG}
-
-	/*whiteMiddle := [7][64]int{nothing, utils.Reverse(PawnMG), utils.Reverse(KnightMG), utils.Reverse(BishopMG),
-		utils.Reverse(RookMG), utils.Reverse(QueenMG), utils.Reverse(KingMG)}
-
-	whiteEnd := [7][64]int{nothing, utils.Reverse(PawnEG), utils.Reverse(KnightMG), utils.Reverse(BishopMG),
-		utils.Reverse(RookEG), utils.Reverse(QueenMG), utils.Reverse(KingEG)}
-
-	white := [2][7][64]int{whiteMiddle, whiteEnd}
-	black := [2][7][64]int{blackMiddle, blackEnd}
-	*/
 	pst := [2][7][64]int{opening, endgame}
 	return pst
 }

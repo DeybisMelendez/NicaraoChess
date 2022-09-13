@@ -27,7 +27,6 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	var lastBestmove chess.Move
 	Nodes = 0
 	FollowPV = false
-	//ScorePV = false
 	score := 0
 	scoreType := "cp"
 	alpha := -Infinity
@@ -38,6 +37,7 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	if board.Wtomove {
 		turn = 1
 	}
+	ClearSearch()
 	for { //Iterative Deepening
 		// TODO detener en jaque mate
 		lastBestmove = PVTable[0][0]
@@ -62,12 +62,9 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 			"nodes", Nodes,
 			"time", time.Now().UnixMilli()-start,
 			"pv", FormatPV())
-		/*if scoreType == "mate" {
-			break
-		}*/
+
 		depth--
 		currDepth++
-		//ResetGlobalVariables()
 	}
 	if Stopped {
 		bestmove = lastBestmove
@@ -76,16 +73,15 @@ func Search(board *chess.Board, stopTime int64, depth int) {
 	}
 	toPrint := "bestmove " + bestmove.String()
 	fmt.Println(toPrint)
-	ClearSearch()
 }
 
 func ClearSearch() {
-	//InitHasTable()
+	InitHasTable()
 	ResetPVTable()
 	ResetGlobalVariables()
 	ResetKillerMoves()
 	ResetHistoryMove()
-	var newRep = [1000]uint64{}
+	var newRep = [256]uint64{}
 	RepetitionTable = newRep
 	GamePly = 0
 }

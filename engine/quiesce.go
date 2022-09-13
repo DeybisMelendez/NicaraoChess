@@ -15,11 +15,10 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 	if standPat > beta {
 		return beta
 	}
-	// Delta pruning
-	/*if standPat < alpha-Delta {
-		return alpha
-	}*/
 	alpha = utils.Max(alpha, standPat)
+	if Ply >= 64 {
+		return alpha
+	}
 	moveList := board.GenerateLegalMoves()
 	bestmove := checkPV(moveList)
 	var score int = 0
@@ -34,7 +33,7 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 			}
 			if chess.IsCapture(moveList[i], board) {
 				var newVal int = GetMVV_LVA(moveList[i], board)
-				if newVal > val {
+				if newVal > val && SEE(board, moveList[i], moveList[i].To(), 0, 1) >= 0 {
 					val = newVal
 					idx = i
 				}
@@ -45,27 +44,18 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		}
 		var move chess.Move = moveList[idx]
 		moveList = append(moveList[:idx], moveList[idx+1:]...)
-		if SEE(board, move, move.To(), 0, 1) >= 0 {
-			unmakeFunc := Make(board, move)
-			score = -Quiesce(board, -beta, -alpha, -turn)
-			Unmake(unmakeFunc)
-			if score > alpha {
-				StorePV(move)
-				alpha = score
-				if score >= beta {
-					return beta
-				}
+		//if SEE(board, move, move.To(), 0, 1) >= 0 {
+		unmakeFunc := Make(board, move)
+		score = -Quiesce(board, -beta, -alpha, -turn)
+		Unmake(unmakeFunc)
+		if score > alpha {
+			StorePV(move)
+			alpha = score
+			if score >= beta {
+				return beta
 			}
-		} /* else {
-			i := -1
-			for i < len(moveList) {
-				i++
-				if moveList[i].To() == move.To() {
-					moveList = append(moveList[:i], moveList[i+1:]...)
-					i = -1
-				}
-			}
-		}*/
+		}
+		//}
 	}
 	return alpha
 }
