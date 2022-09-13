@@ -61,7 +61,7 @@ func isReady() {
 }
 
 func uciNewGame() {
-	engine.ClearSearch()
+	//engine.ClearSearch()
 	board = chess.ParseFen(startpos)
 }
 
@@ -70,13 +70,14 @@ func position(command string) {
 	if commands[1] == "startpos" {
 		uciNewGame()
 	} else if commands[1] == "fen" {
-		engine.ClearSearch()
+		//engine.ClearSearch()
 		board = chess.ParseFen(strings.Split(command, "position fen ")[1])
 	}
 	if strings.Contains(command, "moves ") {
 		split := strings.Split(command, "moves ")[1]
 		if len(split) > 0 {
 			moves := strings.Fields(split)
+			engine.ResetRepetitionTable()
 			for i := 0; i < len(moves); i++ {
 				move, err := chess.ParseMove(moves[i])
 				if err != nil {

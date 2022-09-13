@@ -16,6 +16,12 @@ func IsRepetition(hash uint64) bool {
 	return false
 }
 
+func ResetRepetitionTable() {
+	var newRep = [256]uint64{}
+	RepetitionTable = newRep
+	GamePly = 0
+}
+
 func Make(board *chess.Board, move chess.Move) func() {
 	Ply++
 	Nodes++
