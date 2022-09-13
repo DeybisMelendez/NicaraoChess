@@ -40,9 +40,9 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	var movesSearched int = 0
 	var lenMoveList int = len(moveList)
 	// Check Extension
-	if inCheck {
+	/*if inCheck {
 		depth++
-	}
+	}*/
 	for len(moveList) > 0 {
 		var val int = -1
 		var idx int = 0
@@ -70,15 +70,14 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 					Unmake(unmakeFunc)
 					continue
 				}
-
 			}
 		}
 		var newDepth = depth
-		if newDepth > 3 {
+		/*if newDepth > 3 {
 			if isPVNode && score == NoHashEntry {
 				newDepth -= 2
 			}
-		}
+		}*/
 		if movesSearched == 0 {
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 		} else {
@@ -101,9 +100,9 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			hashFlag = HashFlagExact
 			alpha = score
 			bestmove = move
-			if depth > 4 && depth < 9 {
+			/*if depth > 4 && depth < 9 {
 				depth--
-			}
+			}*/
 			if score >= beta {
 				if !isCapture {
 					StoreKillerMove(move)
@@ -132,7 +131,7 @@ func isTimeToStop() bool {
 	if Stopped {
 		return true
 	}
-	if StopTime != -1 && Nodes&1023 == 0 {
+	if StopTime != -1 && Nodes&8191 == 0 {
 		if time.Now().UnixMilli() >= StopTime {
 			Stopped = true
 			return true

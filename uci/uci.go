@@ -61,23 +61,22 @@ func isReady() {
 }
 
 func uciNewGame() {
-	//engine.ClearSearch()
-	board = chess.ParseFen(startpos)
+	engine.ResetRepetitionTable()
+	engine.ClearSearch()
 }
 
 func position(command string) {
+	//uciNewGame()
 	commands := strings.Fields(command)
 	if commands[1] == "startpos" {
-		uciNewGame()
+		board = chess.ParseFen(startpos)
 	} else if commands[1] == "fen" {
-		//engine.ClearSearch()
 		board = chess.ParseFen(strings.Split(command, "position fen ")[1])
 	}
 	if strings.Contains(command, "moves ") {
 		split := strings.Split(command, "moves ")[1]
 		if len(split) > 0 {
 			moves := strings.Fields(split)
-			engine.ResetRepetitionTable()
 			for i := 0; i < len(moves); i++ {
 				move, err := chess.ParseMove(moves[i])
 				if err != nil {
@@ -92,6 +91,7 @@ func position(command string) {
 }
 
 func goCommand(command string) {
+	start := time.Now().UnixMilli()
 	if !strings.Contains(command, "infinite") {
 		var clock int64 = -1
 		var stopTime int64 = -1
@@ -138,24 +138,30 @@ func goCommand(command string) {
 		if goCommand[1] == "depth" {
 			depth, _ = strconv.Atoi(goCommand[2])
 		}
-		start := time.Now().UnixMilli()
 		if moveTime != -1 {
 			//TODO:Implementar un mejor control de tiempo
 			stopTime = start + moveTime
 		}
 		if clock != -1 {
-			timeleft := (clock-50)/movesToGo + inc
+			timeleft := (clock - 50) / movesToGo
+			if inc > 0 {
+				if clock < 10000 {
+					timeleft += inc * 2 / 3
+				} else {
+					timeleft += inc
+				}
+			}
 			stopTime = start + timeleft
 		}
 		if depth == -1 {
 			depth = 64
 		}
-		fmt.Println(
-			"Time:", clock,
-			"Inc:", inc,
-			"Start:", start,
-			"Stop:", stopTime,
-			"Depth:", depth)
-		engine.Search(&board, stopTime, depth)
+		/*fmt.Println(
+		"Time:", clock,
+		"Inc:", inc,
+		"Start:", start,
+		"Stop:", stopTime,
+		"Depth:", depth)*/
+		go engine.Search(&board, stopTime, start, depth)
 	}
 }
