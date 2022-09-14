@@ -50,7 +50,7 @@ func UCI() {
 }
 
 func uci() {
-	fmt.Println("id name NicaraoChess")
+	fmt.Println("id name NicaraoChess v0.3.1")
 	fmt.Println("id author Deybis Melendez")
 	fmt.Println("option name Hash type spin default 16 min 4 max 16")
 	fmt.Println("uciok")
