@@ -33,7 +33,7 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 			}
 			if chess.IsCapture(moveList[i], board) {
 				var newVal int = GetMVV_LVA(moveList[i], board)
-				if newVal > val && SEE(board, moveList[i], moveList[i].To(), 0, 1) >= 0 {
+				if newVal > val { // && SEE(board, moveList[i], moveList[i].To(), 0, 1) >= 0 {
 					val = newVal
 					idx = i
 				}

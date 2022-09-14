@@ -43,56 +43,76 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	/*if inCheck {
 		depth++
 	}*/
+	var scoreMoveList []int
+	var isCapture bool
+	var isPromotion bool
+	for _, v := range moveList {
+		isCapture = chess.IsCapture(v, board)
+		isPromotion = v.Promote() != chess.Nothing
+		value := ValueMove(board, v, isCapture, isPromotion, bestmove, hashmove)
+		scoreMoveList = append(scoreMoveList, value)
+	}
 	for len(moveList) > 0 {
 		var val int = -1
 		var idx int = 0
-		var ln int = len(moveList)
+		//var ln int = len(moveList)
 		var isCapture bool
 		var isPromotion bool
-		for i := 0; i < ln; i++ {
-			isCapture = chess.IsCapture(moveList[i], board)
-			isPromotion = moveList[i].Promote() != chess.Nothing
-			var newVal int = ValueMove(board, moveList[i], isCapture, isPromotion, bestmove, hashmove)
+		for i, newVal := range scoreMoveList {
+			//var newVal int = scoreMoveList[i]
 			if newVal > val {
 				val = newVal
 				idx = i
 			}
 		}
-		var isTactical bool = inCheck || isCapture || isPromotion
 		var move = moveList[idx]
+		isCapture = chess.IsCapture(move, board)
+		isPromotion = move.Promote() != chess.Nothing
+		var isTactical bool = inCheck || isCapture || isPromotion
 		moveList = append(moveList[:idx], moveList[idx+1:]...)
+		scoreMoveList = append(scoreMoveList[:idx], scoreMoveList[idx+1:]...)
 		unmakeFunc := Make(board, move)
-		//Futility Pruning
-		if !isTactical && depth == 1 && !isPVNode {
-			if !board.OurKingInCheck() {
-				var staticEval int = Evaluate(board, turn)
-				if staticEval+50 < alpha {
+
+		if !isTactical && !isPVNode {
+			// Razoring
+			if depth == 2 {
+				var staticEval = Evaluate(board, turn) + 50
+				if staticEval < alpha {
 					Unmake(unmakeFunc)
-					continue
+					break
+				}
+				//Futility Pruning
+			} else if depth == 1 {
+				if !board.OurKingInCheck() {
+					var staticEval = Evaluate(board, turn) + 50
+					if staticEval < alpha {
+						Unmake(unmakeFunc)
+						continue
+					}
 				}
 			}
 		}
-		var newDepth = depth
+		//var newDepth = depth
 		/*if newDepth > 3 {
 			if isPVNode && score == NoHashEntry {
 				newDepth -= 2
 			}
 		}*/
-		if movesSearched == 0 {
+		/*if movesSearched == 0 {
 			score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
+		} else {*/
+		if movesSearched > 2 { // && !isTactical && !IsKillerMove(move) {
+			score = -Negamax(board, depth*2/3, -alpha-1, -alpha, -turn, DoNull)
 		} else {
-			if movesSearched > 2 && !isTactical && !IsKillerMove(move) {
-				score = -Negamax(board, newDepth*2/3, -alpha-1, -alpha, -turn, DoNull)
-			} else {
-				score = alpha + 1
-			}
-			if score > alpha {
-				score = -Negamax(board, newDepth-1, -alpha-1, -alpha, -turn, DoNull)
-				if score > alpha && score < beta {
-					score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
-				}
+			score = alpha + 1
+		}
+		if score > alpha {
+			score = -Negamax(board, depth-1, -alpha-1, -alpha, -turn, DoNull)
+			if score > alpha && score < beta {
+				score = -Negamax(board, depth-1, -beta, -alpha, -turn, DoNull)
 			}
 		}
+		//}
 		Unmake(unmakeFunc)
 		movesSearched++
 		if score > alpha {
@@ -100,9 +120,9 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			hashFlag = HashFlagExact
 			alpha = score
 			bestmove = move
-			/*if depth > 4 && depth < 9 {
+			if depth > 6 && depth < 12 {
 				depth--
-			}*/
+			}
 			if score >= beta {
 				if !isCapture {
 					StoreKillerMove(move)
