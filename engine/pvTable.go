@@ -4,8 +4,8 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-var PVLength [64]int
-var PVTable [64][64]chess.Move
+var PVLength [128]int
+var PVTable [128][128]chess.Move
 var FollowPV bool
 
 //var ScorePV bool
@@ -23,8 +23,8 @@ func StorePV(move chess.Move) {
 }
 
 func ResetPVTable() {
-	var newPVLength [64]int
-	var newPVTable [64][64]chess.Move
+	var newPVLength [128]int
+	var newPVTable [128][128]chess.Move
 	PVLength = newPVLength
 	PVTable = newPVTable
 }

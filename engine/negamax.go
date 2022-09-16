@@ -21,7 +21,7 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 	if IsRepetition(board.Hash()) {
 		return 0
 	}
-	if depth == 0 || Ply >= 64 {
+	if depth == 0 {
 		return Quiesce(board, alpha, beta, turn)
 	}
 	// Mate Distance pruning
@@ -72,7 +72,6 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 		moveList = append(moveList[:idx], moveList[idx+1:]...)
 		scoreMoveList = append(scoreMoveList[:idx], scoreMoveList[idx+1:]...)
 		unmakeFunc := Make(board, move)
-
 		if !isTactical && !isPVNode {
 			// Razoring
 			if depth == 2 {
@@ -123,16 +122,18 @@ func Negamax(board *chess.Board, depth int, alpha int, beta int, turn int, nullM
 			if depth > 6 && depth < 12 {
 				depth--
 			}
-			if score >= beta {
-				if !isCapture {
-					StoreKillerMove(move)
-					StoreHistoryMove(move, board.Wtomove, depth)
-				}
-				WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta, move)
-				return beta
+			if !isCapture {
+				StoreHistoryMove(move, board.Wtomove, depth)
 			}
 		}
-
+		if alpha >= beta {
+			if !isCapture {
+				StoreKillerMove(move)
+				//StoreHistoryMove(move, board.Wtomove, depth)
+			}
+			WriteHashEntry(board.Hash(), beta, depth, HashFlagBeta, move)
+			return beta
+		}
 	}
 	if lenMoveList == 0 {
 		if inCheck {

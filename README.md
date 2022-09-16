@@ -26,12 +26,11 @@ Nicarao Chess is a basic chess engine written in Go by Deybis Melendez.
     - Killer Heuristic
     - History Heuristic
     - MVV-LVA
-    - SEE
 
 - Selectivity:
-    - Check Extension
     - Late Move Reduction (LMR)
     - Futility Pruning
+    - Razoring
     - Quiescence
     - Mate Distance Pruning
 
@@ -50,3 +49,7 @@ Nicarao Chess is a basic chess engine written in Go by Deybis Melendez.
 - Mop-up Evaluation
 - Internal Iterative Deepening
 - Countermove Heuristic
+
+### Testers
+
+- Felipe Ulloa

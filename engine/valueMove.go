@@ -16,7 +16,7 @@ func ValueMove(board *chess.Board, move chess.Move, isCapture bool, isPromo bool
 	} else if isCapture {
 		return 1000 + GetMVV_LVA(move, board)
 		/*if SEE(board, move, move.To(), 0, 1) > 0 {
-			return 3000 + GetMVV_LVA(move, board)
+			return 170000 + GetMVV_LVA(move, board)
 		} else {
 			return GetMVV_LVA(move, board)
 		}*/

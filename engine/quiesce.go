@@ -16,9 +16,6 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		return beta
 	}
 	alpha = utils.Max(alpha, standPat)
-	if Ply >= 64 {
-		return alpha
-	}
 	moveList := board.GenerateLegalMoves()
 	bestmove := checkPV(moveList)
 	var score int = 0
@@ -48,12 +45,12 @@ func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
 		unmakeFunc := Make(board, move)
 		score = -Quiesce(board, -beta, -alpha, -turn)
 		Unmake(unmakeFunc)
+		if alpha >= beta {
+			return beta
+		}
 		if score > alpha {
 			StorePV(move)
 			alpha = score
-			if score >= beta {
-				return beta
-			}
 		}
 		//}
 	}
