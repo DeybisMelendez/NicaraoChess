@@ -19,6 +19,9 @@ var TotalPhase int = KnightPhase*4 +
 var phase int = TotalPhase
 
 func Evaluate(board *chess.Board, turn int) int {
+	if IsDraw(board) {
+		return 0
+	}
 	opening, endgame := 0, 0
 	allPieces := board.White.All | board.Black.All
 	allPawnCount := bits.OnesCount64(board.White.Pawns | board.Black.Pawns)
@@ -39,10 +42,24 @@ func Evaluate(board *chess.Board, turn int) int {
 	whiteGoodRook := bits.OnesCount64(board.White.Rooks) * GoodRook(allPawnCount)
 	blackGoodRook := bits.OnesCount64(board.White.Rooks) * GoodRook(allPawnCount)
 	opening += whiteGoodRook - blackGoodRook
-
 	opening = endgame
+
 	//Piece Evaluation
 	pieces := board.White.Pawns
+	tropismToWhiteKing := 0
+	tropismToBlackKing := 0
+
+	whiteKing := uint8(bits.TrailingZeros64(board.White.Kings))
+	opening += PST[OPENING][chess.King][ReversedBoard[whiteKing]]
+	endgame += PST[ENDGAME][chess.King][ReversedBoard[whiteKing]]
+	opening -= BadKing(whiteKing, allPieces, board.White.All, false)
+	endgame -= BadKing(whiteKing, allPieces, board.White.All, true)
+	blackKing := uint8(bits.TrailingZeros64(board.Black.Kings))
+	opening -= PST[OPENING][chess.King][blackKing]
+	endgame -= PST[ENDGAME][chess.King][blackKing]
+	opening += BadKing(blackKing, allPieces, board.Black.All, false)
+	endgame += BadKing(blackKing, allPieces, board.Black.All, true)
+
 	for pieces != 0 {
 		square := uint8(bits.TrailingZeros64(pieces))
 		opening += MaterialScore[OPENING][chess.Pawn]
@@ -55,6 +72,7 @@ func Evaluate(board *chess.Board, turn int) int {
 		endgame -= val
 		pieces &= pieces - 1
 	}
+
 	pieces = board.White.Knights
 	for pieces != 0 {
 		square := uint8(bits.TrailingZeros64(pieces))
@@ -65,8 +83,10 @@ func Evaluate(board *chess.Board, turn int) int {
 		mobility := MobilityKnight(square, board.White.Knights)
 		opening += mobility
 		endgame += mobility
+		tropismToBlackKing += nkDist[square][blackKing] * Material[chess.Knight]
 		pieces &= pieces - 1
 	}
+
 	pieces = board.White.Bishops
 	for pieces != 0 {
 		square := uint8(bits.TrailingZeros64(pieces))
@@ -77,6 +97,7 @@ func Evaluate(board *chess.Board, turn int) int {
 		mobility := MobilityBishop(square, allPieces, board.White.All)
 		opening += mobility
 		endgame += mobility
+		tropismToBlackKing += bkDist[square][blackKing] * Material[chess.Bishop]
 		pieces &= pieces - 1
 	}
 	pieces = board.White.Rooks
@@ -87,8 +108,10 @@ func Evaluate(board *chess.Board, turn int) int {
 		opening += PST[OPENING][chess.Rook][ReversedBoard[square]]
 		endgame += PST[ENDGAME][chess.Rook][ReversedBoard[square]]
 		mobility := MobilityRook(square, allPieces, board.White.All)
-		opening += mobility
-		endgame += mobility
+		//rookToQueen := RookToQueen(square, board.Black.Queens)
+		opening += mobility // + rookToQueen
+		endgame += mobility // + rookToQueen
+		tropismToBlackKing += rkDist[square][blackKing] * Material[chess.Rook]
 		pieces &= pieces - 1
 	}
 	pieces = board.White.Queens
@@ -98,6 +121,7 @@ func Evaluate(board *chess.Board, turn int) int {
 		endgame += MaterialScore[ENDGAME][chess.Queen]
 		opening += PST[OPENING][chess.Queen][ReversedBoard[square]]
 		endgame += PST[ENDGAME][chess.Queen][ReversedBoard[square]]
+		tropismToBlackKing += qkDist[square][blackKing] * Material[chess.Queen]
 		pieces &= pieces - 1
 	}
 	pieces = board.Black.Pawns
@@ -123,6 +147,7 @@ func Evaluate(board *chess.Board, turn int) int {
 		mobility := MobilityKnight(square, board.Black.All)
 		opening -= mobility
 		endgame -= mobility
+		tropismToWhiteKing += nkDist[square][whiteKing] * Material[chess.Knight]
 		pieces &= pieces - 1
 	}
 	pieces = board.Black.Bishops
@@ -135,6 +160,7 @@ func Evaluate(board *chess.Board, turn int) int {
 		mobility := MobilityBishop(square, allPieces, board.Black.All)
 		opening -= mobility
 		endgame -= mobility
+		tropismToWhiteKing += bkDist[square][whiteKing] * Material[chess.Bishop]
 		pieces &= pieces - 1
 	}
 	pieces = board.Black.Rooks
@@ -145,8 +171,9 @@ func Evaluate(board *chess.Board, turn int) int {
 		opening -= PST[OPENING][chess.Rook][square]
 		endgame -= PST[ENDGAME][chess.Rook][square]
 		mobility := MobilityRook(square, allPieces, board.Black.All)
-		opening -= mobility
-		endgame -= mobility
+		opening -= mobility // + rookToQueen
+		endgame -= mobility // + rookToQueen
+		tropismToWhiteKing += rkDist[square][whiteKing] * Material[chess.Rook]
 		pieces &= pieces - 1
 	}
 	pieces = board.Black.Queens
@@ -156,31 +183,25 @@ func Evaluate(board *chess.Board, turn int) int {
 		endgame -= MaterialScore[ENDGAME][chess.Queen]
 		opening -= PST[OPENING][chess.Queen][square]
 		endgame -= PST[ENDGAME][chess.Queen][square]
+		tropismToWhiteKing += qkDist[square][whiteKing] * Material[chess.Queen]
 		pieces &= pieces - 1
 	}
-	king := uint8(bits.TrailingZeros64(board.White.Kings))
-	opening += PST[OPENING][chess.King][ReversedBoard[king]]
-	endgame += PST[ENDGAME][chess.King][ReversedBoard[king]]
-	opening -= BadKing(king, allPieces, board.White.All, false)
-	endgame -= BadKing(king, allPieces, board.White.All, true)
-	king = uint8(bits.TrailingZeros64(board.Black.Kings))
-	opening -= PST[OPENING][chess.King][king]
-	endgame -= PST[ENDGAME][chess.King][king]
-	opening += BadKing(king, allPieces, board.Black.All, false)
-	endgame += BadKing(king, allPieces, board.Black.All, true)
 
-	if isEndgame(board) {
+	opening += -tropismToWhiteKing + tropismToBlackKing
+	//endgame += -tropismToWhiteKing + tropismToBlackKing
+
+	/*if isEndgame(board) {
 		if IsDraw(board) {
 			return 0
 		}
 		return endgame * turn // Endgame
-	}
+	}*/
 	phase = ((phase * 256) + (TotalPhase / 2)) / TotalPhase
-	score := ((opening * (256 - phase)) + (opening * phase)) / 256
+	score := ((opening * (256 - phase)) + (endgame * phase)) / 256
 	return score * turn
 }
 
-func isEndgame(board *chess.Board) bool {
+/*func isEndgame(board *chess.Board) bool {
 	queens := board.White.Queens | board.Black.Queens
 	if queens == 0 {
 		return true
@@ -192,4 +213,4 @@ func isEndgame(board *chess.Board) bool {
 		}
 	}
 	return false
-}
+}*/

@@ -22,6 +22,7 @@ func Init() {
 	engine.PST = engine.PstMake()
 	engine.InitHasTable()
 	engine.InitEvaluationMask()
+	engine.SetDist()
 }
 func UCI() {
 	command, _ := inputReader.ReadString('\n')
@@ -154,7 +155,7 @@ func goCommand(command string) {
 			stopTime = start + timeleft
 		}
 		if depth == -1 {
-			depth = 64
+			depth = 32
 		}
 		/*fmt.Println(
 		"Time:", clock,

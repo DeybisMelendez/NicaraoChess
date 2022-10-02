@@ -8,8 +8,12 @@ import (
 var RepetitionTable = [256]uint64{}
 
 func IsRepetition(hash uint64) bool {
+	count := 0
 	for i := 0; i < GamePly; i++ {
 		if hash == RepetitionTable[i] {
+			count++
+		}
+		if count == 2 {
 			return true
 		}
 	}

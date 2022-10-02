@@ -52,4 +52,5 @@ Nicarao Chess is a basic chess engine written in Go by Deybis Melendez.
 
 ### Testers
 
-- Felipe Ulloa
+- Felipe Ulloa (NIC)
+- Salvador Paiz (NIC)

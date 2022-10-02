@@ -17,7 +17,7 @@ b1B3Q1/5K2/5NP1/n7/2p2k1P/3pN2R/1B1P4/4qn2 w - - 0 1
 
 1k6/1P5Q/8/7B/8/5K2/8/8 w - - 0 1
 8/3Q4/3p4/2b2n2/3N1p2/nR2B2b/p7/k1K5 w - - 0 1
-4K3/4P3/P1N2pP1/1BPk1P2/4N3/pP1p1Q2/1br2P2/q1r5 w - - 0 1   Df4 -> 2s
+4K3/4P3/P1N2pP1/1BPk1P2/4N3/pP1p1Q2/1br2P2/q1r5 w - - 0 1   Df4 -> 3s
 
 # Mate en 4
 
