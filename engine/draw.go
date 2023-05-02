@@ -6,7 +6,7 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-func IsDraw(board *chess.Board) bool {
+func isDraw(board *chess.Board) bool {
 	if board.White.Queens|board.Black.Queens == 0 {
 		if board.White.Pawns|board.Black.Pawns == 0 {
 			if board.White.Rooks|board.Black.Rooks == 0 {

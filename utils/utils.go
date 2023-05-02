@@ -7,7 +7,7 @@ import (
 )
 
 // Max returns the larger of x or y.
-func Max(x, y int) int {
+func MaxInt16(x, y int16) int16 {
 	if x < y {
 		return y
 	}
@@ -15,11 +15,17 @@ func Max(x, y int) int {
 }
 
 // Min returns the smaller of x or y.
-func Min(x, y int) int {
+func MinInt16(x, y int16) int16 {
 	if x > y {
 		return y
 	}
 	return x
+}
+func BoolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
 }
 
 // Find returns the smallest index i at which x == a[i],

@@ -2,81 +2,91 @@ package engine
 
 import (
 	"fmt"
+	"math"
+	"unsafe"
 
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-const HashFlagExact, HashFlagAlpha, HashFlagBeta, NoHashEntry = 0, 1, 2, 10000
+const (
+	TTExact int8 = iota
+	TTLower
+	TTUpper
+	NoHashEntry = math.MinInt16
+)
 
-// 16Mb default hash table size
-var Mb uint64 = 16
-var hashEntries uint64 = 838860
-var hashTable []hashEntry
+var ttSize uint64 = 8 * 1024 * 1024 / 20
 
-type hashEntry struct {
-	hash     uint64
-	depth    int
-	flag     int
-	score    int
-	bestmove chess.Move
+type TranspositionTable struct {
+	Hash     uint64
+	Depth    int8
+	Flag     int8
+	Value    int16
+	BestMove chess.Move
 }
 
-func InitHasTable() {
-	var newHashTable []hashEntry
-	hashTable = newHashTable
-	var entries int = int(hashEntries)
-	for i := 0; i < entries; i++ {
-		hashTable = append(hashTable, hashEntry{hash: 0, depth: 0, flag: 0, score: 0, bestmove: 0})
+var transpositionTable []TranspositionTable
+
+func ResizeTranspositionTable(sizeMB uint64) {
+	// Convertir MB a bytes
+	var sizeBytes uint64 = sizeMB * 1024 * 1024
+	// Calcular el nuevo tamaño de la tabla de transposición
+	ttSize = sizeBytes / uint64(unsafe.Sizeof(TranspositionTable{})+unsafe.Alignof(TranspositionTable{}))
+	transpositionTable = make([]TranspositionTable, ttSize)
+	fmt.Println("Set hash table size to", sizeMB, "Mb")
+	fmt.Println("Hash table initialized with", ttSize, "entries")
+}
+
+func writeTTEntry(hash uint64, value int16, depth int8, flag int8, bestmove chess.Move) {
+	ttEntry := &transpositionTable[hash%ttSize]
+	if depth > ttEntry.Depth {
+		ttEntry.Depth = depth
+		ttEntry.Flag = flag
+		ttEntry.Value = value
+		ttEntry.BestMove = bestmove
+		ttEntry.Hash = hash
 	}
 }
 
-func WriteHashEntry(hash uint64, score int, depth int, flag int, move chess.Move) {
-	index := (hash & 0x7fffffff) % hashEntries
-	if score < -MateValue+1000 {
-		score -= Ply
-	} else if score > MateValue-1000 {
-		score += Ply
-	}
-	hashTable[index].hash = hash
-	hashTable[index].depth = depth
-	hashTable[index].score = score
-	hashTable[index].flag = flag
-	hashTable[index].bestmove = move
-}
-
-func ReadHashEntry(hash uint64, alpha int, beta int, depth int, move *chess.Move) int {
-	var entry hashEntry = hashTable[(hash&0x7fffffff)%hashEntries]
-	if entry.hash == hash {
-		if entry.depth >= depth {
-			var score int = entry.score
-			if score < -MateValue+1000 {
-				score += Ply
-			} else if score > MateValue-1000 {
-				score -= Ply
+func readTTEntry(hash uint64, alpha int16, beta int16, depth int8, move *chess.Move) int16 {
+	var ttEntry TranspositionTable = getEntry(hash)
+	if ttEntry.Hash == hash {
+		if ttEntry.Depth >= depth {
+			if ttEntry.Flag == TTExact {
+				return ttEntry.Value
 			}
-			if entry.flag == HashFlagExact {
-				return score
-			}
-			if (entry.flag == HashFlagAlpha) && (score <= alpha) {
+			if ttEntry.Flag == TTUpper && ttEntry.Value <= alpha {
 				return alpha
 			}
-			if (entry.flag == HashFlagBeta) && (score >= beta) {
+			if ttEntry.Flag == TTLower && ttEntry.Value >= beta {
 				return beta
 			}
-			*move = entry.bestmove
 		}
+		*move = ttEntry.BestMove
 	}
 	return NoHashEntry
 }
 
-func SetHashTable(mb uint64) {
-	if mb < 4 {
-		Mb = 4
-	} else if mb > 16 {
-		Mb = 16
+func getPV(fen string, depth int8, bestmove *chess.Move) string {
+	var pv string
+	var board chess.Board = chess.ParseFen(fen)
+
+	for i := int8(0); i < depth; i++ {
+		hash := board.Hash()
+		entry := getEntry(hash)
+		if entry.Hash == hash && entry.BestMove != 0 {
+			if i == 0 {
+				*bestmove = entry.BestMove
+			}
+			pv += entry.BestMove.String() + " "
+			board.Apply(entry.BestMove)
+		} else {
+			break
+		}
 	}
-	hashEntries = mb * 0x100000 / 20
-	InitHasTable()
-	fmt.Println("Set hash table size to", Mb, "Mb")
-	fmt.Println("Hash table initialized with", hashEntries, "entries")
+	return pv
+}
+
+func getEntry(hash uint64) TranspositionTable {
+	return transpositionTable[hash%ttSize]
 }

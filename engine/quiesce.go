@@ -6,54 +6,58 @@ import (
 	chess "github.com/dylhunn/dragontoothmg"
 )
 
-func Quiesce(board *chess.Board, alpha int, beta int, turn int) int {
+// DELTA_PRUNING for Quiesce
+const DELTA_PRUNING = 20
+
+func quiesce(board *chess.Board, alpha int16, beta int16, turn int16) int16 {
 	if isTimeToStop() {
 		return 0
 	}
-	PVLength[Ply] = Ply
-	standPat := Evaluate(board, turn)
-	if standPat > beta {
+	var standPat int16 = Evaluate(board, turn)
+	// Standing Pat
+	if standPat >= beta {
 		return beta
 	}
-	alpha = utils.Max(alpha, standPat)
+	alpha = utils.MaxInt16(alpha, standPat)
+	// Delta pruning
+	/*if standPat+DELTA_PRUNING <= alpha {
+		return alpha
+	}*/
 	moveList := board.GenerateLegalMoves()
-	bestmove := checkPV(moveList)
-	var score int = 0
+	if len(moveList) == 0 {
+		return standPat
+	}
 	for {
-		var val int = -1
-		var idx int = -1
-		var ln int = len(moveList)
-		for i := 0; i < ln; i++ {
-			if moveList[i] == bestmove && FollowPV {
-				idx = i
-				break
-			}
-			if chess.IsCapture(moveList[i], board) {
-				var newVal int = GetMVV_LVA(moveList[i], board)
-				if newVal >= val && SEE(board, moveList[i], moveList[i].To(), 0, 1) >= 0 {
-					val = newVal
+		var maxScoreMove int16
+		var hasCapture bool
+		var idx int
+		for i, candidate := range moveList {
+			var scoreMove int16
+			if chess.IsCapture(candidate, board) {
+				hasCapture = true
+				scoreMove = getMVV_LVA(candidate, board)
+				if scoreMove > maxScoreMove {
+					maxScoreMove = scoreMove
 					idx = i
 				}
 			}
 		}
-		if idx == -1 {
+		if !hasCapture {
 			break
 		}
 		var move chess.Move = moveList[idx]
 		moveList = append(moveList[:idx], moveList[idx+1:]...)
-		//if SEE(board, move, move.To(), 0, 1) >= 0 {
-		unmakeFunc := Make(board, move)
-		score = -Quiesce(board, -beta, -alpha, -turn)
-		Unmake(unmakeFunc)
-		if score > alpha {
-			StorePV(move)
-			alpha = score
-		}
-		if alpha >= beta {
+		unmakeMoveFunc := makeMove(board, move)
+		eval := -quiesce(board, -beta, -alpha, -turn)
+		unmakeMove(unmakeMoveFunc)
+		alpha = utils.MaxInt16(alpha, eval)
+		if eval >= beta {
 			return beta
 		}
 
-		//}
+		/*if eval >= beta-DELTA_PRUNING {
+			return beta
+		}*/
 	}
 	return alpha
 }

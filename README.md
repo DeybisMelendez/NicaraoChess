@@ -6,51 +6,48 @@ Nicarao Chess is a basic chess engine written in Go by Deybis Melendez.
 
 ## Features
 
-### Communication 
+### Communication
 
-- UCI Protocol
+-   UCI Protocol
 
 ### Board
 
-- github.com/dylhunn/dragontoothmg
+-   github.com/dylhunn/dragontoothmg
 
 ### Search
 
-- Principal Variation Search
-- Iterative Deepening
-- Transposition Table
+-   Negamax Alpha Beta framework
+-   Iterative Deepening
+-   Transposition Table
 
-- Move Ordering:
-    - Hash Move
-    - PV Move
-    - Killer Heuristic
-    - History Heuristic
-    - MVV-LVA
+-   Move Ordering:
 
-- Selectivity:
-    - Late Move Reduction (LMR)
-    - Futility Pruning
-    - Razoring
-    - Quiescence
-    - Mate Distance Pruning
+    -   Hash Move
+    -   Killer Heuristic
+    -   History Heuristic
+    -   MVV-LVA
+
+-   Selectivity:
+    -   Late Move Reduction (LMR)
+    -   Quiescence
 
 ### Evaluation
 
-- Material
-- Piece Square Table
-- Evaluation of pieces
-- Tapered eval
-- Basic Draw Evaluation
+-   Material
+-   Piece Square Table
+-   Evaluation of pieces
+-   Tapered eval
+-   Basic Draw Evaluation
 
 ### TODO
 
-- Aspiration Window
-- Draw Evaluation
-- Mop-up Evaluation
-- Internal Iterative Deepening
-- Countermove Heuristic
+-   Aspiration Window
+-   Draw Evaluation
+-   Mop-up Evaluation
+-   Internal Iterative Deepening
+-   Countermove Heuristic
 
 ### Testers
 
-- Felipe Ulloa (NIC)
-- Salvador Paiz (NIC)
+-   Felipe Ulloa (NIC)
+-   Salvador Paiz (NIC)

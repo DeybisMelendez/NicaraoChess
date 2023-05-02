@@ -1,11 +1,9 @@
 package main
 
-import (
-	"nicarao/uci"
-)
+import "nicarao/uci"
 
 func main() {
-	uci.Init()
+	//uci.Init()
 	//Ddebug()
 	uci.UCI()
 }

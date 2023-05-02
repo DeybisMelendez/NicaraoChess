@@ -10,8 +10,8 @@ var FileMask = [64]uint64{}
 var RankMask = [64]uint64{}
 var IsolatedMask = [64]uint64{}
 
-// var WhitePassedMask = [64]uint64{}
-// var BlackPassedMask = [64]uint64{}
+var WhitePassedMask = [64]uint64{}
+var BlackPassedMask = [64]uint64{}
 var knightMasks = [64]uint64{
 	0x0000000000020400, 0x0000000000050800, 0x00000000000a1100, 0x0000000000142200,
 	0x0000000000284400, 0x0000000000508800, 0x0000000000a01000, 0x0000000000402000,
@@ -79,7 +79,7 @@ func InitEvaluationMask() {
 			IsolatedMask[square] |= setFileRankMask(file+1, -1)
 		}
 	}
-	/*for rank := 0; rank < 8; rank++ {
+	for rank := 0; rank < 8; rank++ {
 		for file := 0; file < 8; file++ {
 			var square int = rank*8 + file
 			WhitePassedMask[square] |= setFileRankMask(file-1, -1)
@@ -95,5 +95,5 @@ func InitEvaluationMask() {
 				BlackPassedMask[square] &= ^RankMask[i*8+file]
 			}
 		}
-	}*/
+	}
 }
